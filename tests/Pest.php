@@ -44,7 +44,11 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function createApplication()
 {
-    // ..
+    $app = require __DIR__.'/../vendor/orchestra/testbench/laravel/bootstrap/app.php';
+
+    $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+
+    return $app;
 }
