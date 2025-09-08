@@ -4,3 +4,9 @@ composer.lock
 .phpunit.result.cache
 .idea
 tests/__fixtures__
+
+# Code coverage reports
+coverage-html/
+coverage.xml
+coverage.txt
+.coverage/
