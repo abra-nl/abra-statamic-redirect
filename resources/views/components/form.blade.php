@@ -55,7 +55,7 @@
     </div>
 
     <div class="flex justify-end mt-4">
-        <a href="{{ cp_route('abra-redirects.index') }}" class="btn">Cancel</a>
+        <a href="{{ cp_route('abra-statamic-redirects.index') }}" class="btn">Cancel</a>
         <button type="submit" class="btn-primary ml-2">{{ $submitButtonText }}</button>
     </div>
 </form>

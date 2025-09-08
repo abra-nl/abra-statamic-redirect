@@ -5,7 +5,7 @@
 @section('content')
     <div class="flex items-center mb-3">
         <h1 class="flex-1">Redirects</h1>
-        <a href="{{ cp_route('abra-redirects.create') }}" class="btn-primary">Add Redirect</a>
+        <a href="{{ cp_route('abra-statamic-redirects.create') }}" class="btn-primary">Add Redirect</a>
     </div>
 
     <div class="card p-0">
@@ -26,8 +26,8 @@
                     <td>{{ $redirect['status_code'] }}</td>
                     <td class="flex justify-end">
                         <div class="btn-group">
-                            <a href="{{ cp_route('abra-redirects.edit', $redirect['id']) }}" class="btn">Edit</a>
-                            <form method="POST" action="{{ cp_route('abra-redirects.destroy', $redirect['id']) }}" class="inline">
+                            <a href="{{ cp_route('abra-statamic-redirects.edit', $redirect['id']) }}" class="btn">Edit</a>
+                            <form method="POST" action="{{ cp_route('abra-statamic-redirects.destroy', $redirect['id']) }}" class="inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn-danger ml-2" onclick="return confirm('Are you sure you want to delete this redirect?')">Delete</button>
