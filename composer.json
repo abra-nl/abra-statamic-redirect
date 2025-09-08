@@ -22,7 +22,10 @@
     "require-dev": {
         "orchestra/testbench": "^10.6",
         "pestphp/pest": "^4.0",
-        "mockery/mockery": "^1.6"
+        "mockery/mockery": "^1.6",
+        "laravel/pint": "^1.0",
+        "phpstan/phpstan": "^1.0",
+        "rector/rector": "^1.0"
     },
     "require": {
         "php": "^8.1",
@@ -53,6 +56,23 @@
         "test:coverage-html": "php -d \"zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-83-arm64.so\" -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --coverage-html=coverage-html",
         "test:coverage-clover": "php -d \"zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-83-arm64.so\" -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --coverage-clover=coverage.xml",
         "test:coverage-text": "php -d \"zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-83-arm64.so\" -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --coverage-text",
-        "test:min-coverage": "php -d \"zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-83-arm64.so\" -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --min=80"
+        "test:min-coverage": "php -d \"zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-83-arm64.so\" -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --min=80",
+        "pint": "./vendor/bin/pint",
+        "pint:check": "./vendor/bin/pint --test",
+        "pint:dirty": "./vendor/bin/pint --dirty",
+        "stan": "./vendor/bin/phpstan analyse",
+        "stan:baseline": "./vendor/bin/phpstan analyse --generate-baseline",
+        "rector": "./vendor/bin/rector process",
+        "rector:dry": "./vendor/bin/rector process --dry-run",
+        "code:check": [
+            "@pint:check",
+            "@stan",
+            "@test"
+        ],
+        "code:fix": [
+            "@pint",
+            "@rector",
+            "@test"
+        ]
     }
 }

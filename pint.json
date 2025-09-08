@@ -1,0 +1,16 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "simplified_null_return": false,
+        "modernize_strpos": true,
+        "use_arrow_functions": false,
+        "trailing_comma_in_multiline": {
+            "elements": ["arrays", "arguments", "parameters"]
+        }
+    },
+    "exclude": [
+        "vendor",
+        "node_modules",
+        "coverage-html"
+    ]
+}
