@@ -1,0 +1,45 @@
+{
+    "name": "abra/abra-statamic-redirect",
+    "description": "A flexible redirects manager for Statamic with file-based and database storage options",
+    "type": "statamic-addon",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mike Slinkman",
+            "email": "mike@abra.ai"
+        }
+    ],
+    "autoload": {
+      "psr-4": {
+        "Abra\\AbraStatamicRedirect\\": "src/"
+      }
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "Abra\\AbraStatamicRedirect\\Tests\\": "tests/"
+      }
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.6"
+    },
+    "require": {
+        "php": "^8.1",
+        "statamic/cms": "^5.64"
+    },
+    "config": {
+        "allow-plugins": {
+            "pixelfear/composer-dist-plugin": true
+        }
+    },
+    "extra": {
+      "statamic": {
+        "name": "Abra Statamic Redirect",
+        "description": "Manage site redirects with file-based and database storage options"
+      },
+      "laravel": {
+        "providers": [
+          "Abra\\AbraStatamicRedirect\\ServiceProvider"
+        ]
+      }
+    }
+}
