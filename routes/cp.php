@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Abra\AbraStatamicRedirect\Http\Controllers\RedirectController;
 
 Route::prefix('redirects')->name('abra-statamic-redirects.')->group(function () {
     Route::get('/', [RedirectController::class, 'index'])->name('index');
