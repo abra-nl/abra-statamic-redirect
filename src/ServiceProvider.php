@@ -42,7 +42,7 @@ class ServiceProvider extends AddonServiceProvider
         Nav::extend(function ($nav) {
             $nav->create('Redirects')
                 ->section('Settings')
-                ->route('abra-statamic-redirects.index')
+                ->route('statamic.cp.abra-statamic-redirects.index')
                 ->icon('list');
         });
     }
