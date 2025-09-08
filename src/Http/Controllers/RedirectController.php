@@ -1,8 +1,8 @@
 <?php
 
-namespace Abra\AbraStatmicRedirect\Http\Controllers;
+namespace Abra\AbraStatamicRedirect\Http\Controllers;
 
-use Abra\AbraRedirect\Interfaces\RedirectRepository;
+use Abra\AbraStatamicRedirect\Interfaces\RedirectRepository;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -58,7 +58,7 @@ class RedirectController extends CpController
 
         $this->redirects->store($validated);
 
-        return redirect()->route('statamic.cp.abra-redirects.index')->with('success', 'Redirect created successfully.');
+        return redirect()->route('statamic.cp.abra-statamic-redirects.index')->with('success', 'Redirect created successfully.');
     }
 
     /**
@@ -70,7 +70,7 @@ class RedirectController extends CpController
         $redirect = collect($redirects)->firstWhere('id', $id);
 
         if (! $redirect) {
-            return redirect()->route('statamic.cp.abra-redirects.index')->with('error', 'Redirect not found.');
+            return redirect()->route('statamic.cp.abra-statamic-redirects.index')->with('error', 'Redirect not found.');
         }
 
         return view('abra-redirects::edit', [
@@ -103,7 +103,7 @@ class RedirectController extends CpController
 
         $this->redirects->update($id, $validated);
 
-        return redirect()->route('statamic.cp.abra-redirects.index')->with('success', 'Redirect updated successfully.');
+        return redirect()->route('statamic.cp.abra-statamic-redirects.index')->with('success', 'Redirect updated successfully.');
     }
 
     /**
@@ -116,6 +116,6 @@ class RedirectController extends CpController
     {
         $this->redirects->delete($id);
 
-        return redirect()->route('statamic.cp.abra-redirects.index')->with('success', 'Redirect deleted successfully.');
+        return redirect()->route('statamic.cp.abra-statamic-redirects.index')->with('success', 'Redirect deleted successfully.');
     }
 }
