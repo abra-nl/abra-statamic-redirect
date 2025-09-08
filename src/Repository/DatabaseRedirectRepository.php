@@ -7,7 +7,6 @@ use Abra\AbraStatamicRedirect\Interfaces\RedirectRepository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class DatabaseRedirectRepository implements RedirectRepository
@@ -19,7 +18,6 @@ class DatabaseRedirectRepository implements RedirectRepository
     protected bool $cache_enabled;
 
     protected int $cache_expiry;
-
 
     public function __construct()
     {
@@ -109,7 +107,7 @@ class DatabaseRedirectRepository implements RedirectRepository
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function update(string $id, array $data): array
     {

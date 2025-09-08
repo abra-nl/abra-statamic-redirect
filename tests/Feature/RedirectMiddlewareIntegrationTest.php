@@ -10,7 +10,7 @@ beforeEach(function () {
     $this->actingAs(User::make()
         ->email('test@example.com')
         ->makeSuper()
-        ->save()
+        ->save(),
     );
 });
 
@@ -23,7 +23,7 @@ describe('RedirectMiddleware Integration', function () {
             ->andReturn([
                 'source' => '/integration-test',
                 'destination' => '/integration-destination',
-                'status_code' => 301
+                'status_code' => 301,
             ]);
 
         app()->bind(RedirectRepository::class, function () use ($mockRepository) {
@@ -68,7 +68,7 @@ describe('RedirectMiddleware Integration', function () {
         // Should get 404 since route doesn't exist, but that means middleware passed it through
         // The important thing is the repository was called and no redirect was found
         $response->assertStatus(404);
-        
+
         // Verify the middleware called the repository (mocked expectation will ensure this)
         expect(true)->toBeTrue(); // Mock expectation validates the behavior
     });
@@ -100,7 +100,7 @@ describe('RedirectMiddleware Integration', function () {
             ->andReturn([
                 'source' => '/query-test',
                 'destination' => '/query-destination',
-                'status_code' => 302
+                'status_code' => 302,
             ]);
 
         app()->bind(RedirectRepository::class, function () use ($mockRepository) {
@@ -133,7 +133,7 @@ describe('RedirectMiddleware Integration', function () {
             ->andReturn([
                 'source' => '/api-endpoint',
                 'destination' => '/new-api-endpoint',
-                'status_code' => 301
+                'status_code' => 301,
             ]);
 
         app()->bind(RedirectRepository::class, function () use ($mockRepository) {
@@ -147,7 +147,7 @@ describe('RedirectMiddleware Integration', function () {
         $response->assertStatus(301);
         $response->assertRedirect('/new-api-endpoint');
 
-        // Test PUT request  
+        // Test PUT request
         $response = $this->put('/api-endpoint', ['data' => 'test']);
         $response->assertStatus(301);
         $response->assertRedirect('/new-api-endpoint');
@@ -156,7 +156,7 @@ describe('RedirectMiddleware Integration', function () {
     test('middleware caching works end-to-end', function () {
         config([
             'redirects.cache.enabled' => true,
-            'redirects.cache.expiry' => 60
+            'redirects.cache.expiry' => 60,
         ]);
 
         // Clear cache
@@ -169,7 +169,7 @@ describe('RedirectMiddleware Integration', function () {
             ->andReturn([
                 'source' => '/cached-integration',
                 'destination' => '/cached-integration-destination',
-                'status_code' => 301
+                'status_code' => 301,
             ]);
 
         app()->bind(RedirectRepository::class, function () use ($mockRepository) {
@@ -202,7 +202,7 @@ describe('RedirectMiddleware Integration', function () {
             ->andReturn([
                 'source' => '/blog/*',
                 'destination' => '/articles/some-post',
-                'status_code' => 301
+                'status_code' => 301,
             ]);
 
         app()->bind(RedirectRepository::class, function () use ($mockRepository) {
@@ -216,7 +216,7 @@ describe('RedirectMiddleware Integration', function () {
         });
 
         $response = $this->get('/blog/some-post');
-        
+
         $response->assertStatus(301);
         $response->assertRedirect('/articles/some-post');
     });
@@ -228,7 +228,7 @@ describe('RedirectMiddleware Integration', function () {
             ->andReturn([
                 'source' => '/',
                 'destination' => '/welcome',
-                'status_code' => 302
+                'status_code' => 302,
             ]);
 
         app()->bind(RedirectRepository::class, function () use ($mockRepository) {
@@ -242,7 +242,7 @@ describe('RedirectMiddleware Integration', function () {
         });
 
         $response = $this->get('/');
-        
+
         $response->assertStatus(302);
         $response->assertRedirect('/welcome');
     });
@@ -257,7 +257,7 @@ describe('RedirectMiddleware Integration', function () {
                 ->andReturn([
                     'source' => "/status-{$statusCode}",
                     'destination' => "/new-status-{$statusCode}",
-                    'status_code' => $statusCode
+                    'status_code' => $statusCode,
                 ]);
 
             app()->bind(RedirectRepository::class, function () use ($mockRepository) {
@@ -271,7 +271,7 @@ describe('RedirectMiddleware Integration', function () {
             });
 
             $response = $this->get("/status-{$statusCode}");
-            
+
             $response->assertStatus($statusCode);
             $response->assertRedirect("/new-status-{$statusCode}");
         }
@@ -284,7 +284,7 @@ describe('RedirectMiddleware Integration', function () {
             ->andReturn([
                 'source' => '/complex-query',
                 'destination' => '/new-complex?existing=true&default=1',
-                'status_code' => 301
+                'status_code' => 301,
             ]);
 
         app()->bind(RedirectRepository::class, function () use ($mockRepository) {
@@ -299,7 +299,7 @@ describe('RedirectMiddleware Integration', function () {
 
         // Request with additional query parameters
         $response = $this->get('/complex-query?utm_campaign=test&source=email&page=5');
-        
+
         $response->assertStatus(301);
         // Should append new parameters to existing ones
         $targetUrl = $response->headers->get('Location');

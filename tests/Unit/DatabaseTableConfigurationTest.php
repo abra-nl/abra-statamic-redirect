@@ -10,16 +10,16 @@ describe('Database Table Configuration', function () {
         // Create a temporary config instance without the redirects.table key
         $originalConfig = config('redirects.table');
         config(['redirects' => []]);
-        
-        $repository = new DatabaseRedirectRepository();
-        
+
+        $repository = new DatabaseRedirectRepository;
+
         // Use reflection to access private table property
         $reflection = new ReflectionClass($repository);
         $tableProperty = $reflection->getProperty('table');
         $tableProperty->setAccessible(true);
-        
+
         expect($tableProperty->getValue($repository))->toBe('redirects');
-        
+
         // Restore original config
         if ($originalConfig !== null) {
             config(['redirects.table' => $originalConfig]);
@@ -28,21 +28,21 @@ describe('Database Table Configuration', function () {
 
     test('database repository uses configured table name', function () {
         config(['redirects.table' => 'custom_redirects_table']);
-        
-        $repository = new DatabaseRedirectRepository();
-        
+
+        $repository = new DatabaseRedirectRepository;
+
         // Use reflection to access private table property
         $reflection = new ReflectionClass($repository);
         $tableProperty = $reflection->getProperty('table');
         $tableProperty->setAccessible(true);
-        
+
         expect($tableProperty->getValue($repository))->toBe('custom_redirects_table');
     });
 
     test('database repository operations use configured table name', function () {
         $customTableName = 'my_custom_redirects';
         config(['redirects.table' => $customTableName]);
-        
+
         // Create the custom table for testing
         Schema::create($customTableName, function (Blueprint $table) {
             $table->uuid('id')->primary();
@@ -52,13 +52,13 @@ describe('Database Table Configuration', function () {
             $table->timestamps();
         });
 
-        $repository = new DatabaseRedirectRepository();
+        $repository = new DatabaseRedirectRepository;
 
         // Test store operation
         $redirectData = [
             'source' => '/test-source',
             'destination' => '/test-destination',
-            'status_code' => 301
+            'status_code' => 301,
         ];
 
         $storedRedirect = $repository->store($redirectData);
@@ -85,7 +85,7 @@ describe('Database Table Configuration', function () {
 
         // Test update operation
         $updatedRedirect = $repository->update($storedRedirect['id'], [
-            'destination' => '/updated-destination'
+            'destination' => '/updated-destination',
         ]);
         expect($updatedRedirect['destination'])->toBe('/updated-destination');
 
@@ -121,41 +121,41 @@ describe('Database Table Configuration', function () {
 
         // Create repositories with different table configurations
         config(['redirects.table' => $table1]);
-        $repository1 = new DatabaseRedirectRepository();
+        $repository1 = new DatabaseRedirectRepository;
 
         config(['redirects.table' => $table2]);
-        $repository2 = new DatabaseRedirectRepository();
+        $repository2 = new DatabaseRedirectRepository;
 
         // Store data in each repository
         $redirect1 = $repository1->store([
             'source' => '/table1-source',
             'destination' => '/table1-destination',
-            'status_code' => 301
+            'status_code' => 301,
         ]);
 
         $redirect2 = $repository2->store([
             'source' => '/table2-source',
             'destination' => '/table2-destination',
-            'status_code' => 302
+            'status_code' => 302,
         ]);
 
         // Verify data isolation
         expect($repository1->all())->toHaveCount(1);
         expect($repository2->all())->toHaveCount(1);
-        
+
         expect($repository1->find('/table1-source'))->not->toBeNull();
         expect($repository1->find('/table2-source'))->toBeNull();
-        
+
         expect($repository2->find('/table2-source'))->not->toBeNull();
         expect($repository2->find('/table1-source'))->toBeNull();
 
         // Verify direct table queries
         expect(DB::table($table1)->count())->toBe(1);
         expect(DB::table($table2)->count())->toBe(1);
-        
+
         $table1Data = DB::table($table1)->first();
         $table2Data = DB::table($table2)->first();
-        
+
         expect($table1Data->source)->toBe('/table1-source');
         expect($table2Data->source)->toBe('/table2-source');
 
@@ -179,12 +179,12 @@ describe('Database Table Configuration', function () {
 
         // Configure and use original table
         config(['redirects.table' => $originalTable]);
-        $repository = new DatabaseRedirectRepository();
-        
+        $repository = new DatabaseRedirectRepository;
+
         $redirect = $repository->store([
             'source' => '/original-source',
             'destination' => '/original-destination',
-            'status_code' => 301
+            'status_code' => 301,
         ]);
 
         expect($repository->all())->toHaveCount(1);
@@ -200,7 +200,7 @@ describe('Database Table Configuration', function () {
 
         // Create new repository instance with new config
         config(['redirects.table' => $newTable]);
-        $newRepository = new DatabaseRedirectRepository();
+        $newRepository = new DatabaseRedirectRepository;
 
         // Verify new repository uses new table (should be empty)
         expect($newRepository->all())->toHaveCount(0);
@@ -209,7 +209,7 @@ describe('Database Table Configuration', function () {
         $newRepository->store([
             'source' => '/new-source',
             'destination' => '/new-destination',
-            'status_code' => 301
+            'status_code' => 301,
         ]);
 
         expect($newRepository->all())->toHaveCount(1);

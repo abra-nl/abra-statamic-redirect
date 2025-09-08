@@ -15,7 +15,7 @@ class TestCase extends AddonTestCase
         parent::resolveApplicationConfiguration($app);
 
         // Set a proper application key
-        $app['config']->set('app.key', 'base64:' . base64_encode(random_bytes(32)));
+        $app['config']->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
 
         // Enable Statamic Pro features for testing
         $app['config']->set('statamic.editions.pro', true);
@@ -26,7 +26,7 @@ class TestCase extends AddonTestCase
             301 => 'Permanent',
             302 => 'Temporary',
             307 => 'Temporary (preserve method)',
-            308 => 'Permanent (preserve method)'
+            308 => 'Permanent (preserve method)',
         ]);
     }
 }

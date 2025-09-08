@@ -41,9 +41,6 @@ trait ConvertsWildcardPatterns
 
     /**
      * Normalize URL for consistent matching
-     *
-     * @param  string  $url
-     * @return string
      */
     protected function normalizeUrl(string $url): string
     {

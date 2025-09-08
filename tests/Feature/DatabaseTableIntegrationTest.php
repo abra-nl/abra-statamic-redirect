@@ -1,6 +1,5 @@
 <?php
 
-use Abra\AbraStatamicRedirect\Repository\DatabaseRedirectRepository;
 use Illuminate\Support\Facades\Schema;
 use Statamic\Facades\User;
 
@@ -9,39 +8,39 @@ beforeEach(function () {
     $this->actingAs(User::make()
         ->email('test@example.com')
         ->makeSuper()
-        ->save()
+        ->save(),
     );
 });
 
 describe('Database Table Integration', function () {
     test('full integration test with custom table name from config to controller', function () {
         $customTableName = 'integration_test_redirects';
-        
+
         // Configure custom table name
         config([
             'redirects.table' => $customTableName,
             'redirects.storage' => 'database',
-            'redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']
+            'redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary'],
         ]);
 
         // Run migration to create custom table
-        $migrationPath = __DIR__ . '/../../database/migrations/2025_05_08_100000_create_redirects_table.php';
+        $migrationPath = __DIR__.'/../../database/migrations/2025_05_08_100000_create_redirects_table.php';
         require_once $migrationPath;
-        
-        $migration = new CreateRedirectsTable();
-        
+
+        $migration = new CreateRedirectsTable;
+
         // Clean up any existing table
         Schema::dropIfExists($customTableName);
         $migration->up();
-        
+
         // Verify custom table was created
         expect(Schema::hasTable($customTableName))->toBeTrue();
 
         // Test through controller - create a redirect
         $redirectData = [
             'source' => '/integration-test-source',
-            'destination' => '/integration-test-destination', 
-            'status_code' => 301
+            'destination' => '/integration-test-destination',
+            'status_code' => 301,
         ];
 
         $response = $this->post(cp_route('abra-statamic-redirects.store'), $redirectData);
@@ -60,7 +59,7 @@ describe('Database Table Integration', function () {
         $response->assertSee('/integration-test-source');
         $response->assertSee('/integration-test-destination');
 
-        // Test through controller - edit redirect  
+        // Test through controller - edit redirect
         $redirectId = $tableData->id;
         $response = $this->get(cp_route('abra-statamic-redirects.edit', $redirectId));
         $response->assertStatus(200);
@@ -69,7 +68,7 @@ describe('Database Table Integration', function () {
         $updateData = [
             'source' => '/integration-test-source',
             'destination' => '/updated-destination',
-            'status_code' => 302
+            'status_code' => 302,
         ];
 
         $response = $this->patch(cp_route('abra-statamic-redirects.update', $redirectId), $updateData);

@@ -10,3 +10,9 @@ coverage-html/
 coverage.xml
 coverage.txt
 .coverage/
+
+# Static analysis and code quality tools
+phpstan-baseline.neon
+.phpstan-cache/
+.rector/
+.pint.cache

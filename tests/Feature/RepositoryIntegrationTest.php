@@ -10,7 +10,7 @@ beforeEach(function () {
     $this->actingAs(User::make()
         ->email('test@example.com')
         ->makeSuper()
-        ->save()
+        ->save(),
     );
 });
 
@@ -22,9 +22,9 @@ describe('Repository Integration', function () {
         // Mock the file repository directly in the container
         $mockRepository = Mockery::mock(FileRedirectRepository::class);
         $mockRepository->shouldReceive('all')->once()->andReturn([
-            ['id' => '1', 'source' => '/test', 'destination' => '/new', 'status_code' => 301]
+            ['id' => '1', 'source' => '/test', 'destination' => '/new', 'status_code' => 301],
         ]);
-        
+
         // Replace the bound repository
         app()->bind(RedirectRepository::class, function () use ($mockRepository) {
             return $mockRepository;
@@ -33,7 +33,7 @@ describe('Repository Integration', function () {
         $response = $this->get(cp_route('abra-statamic-redirects.index'));
 
         $response->assertStatus(200);
-        
+
         // Verify the repository was called
         $mockRepository->shouldHaveReceived('all')->once();
     });
@@ -45,9 +45,9 @@ describe('Repository Integration', function () {
         // Mock the database repository directly in the container
         $mockRepository = Mockery::mock(DatabaseRedirectRepository::class);
         $mockRepository->shouldReceive('all')->once()->andReturn([
-            ['id' => '1', 'source' => '/test', 'destination' => '/new', 'status_code' => 301]
+            ['id' => '1', 'source' => '/test', 'destination' => '/new', 'status_code' => 301],
         ]);
-        
+
         // Replace the bound repository
         app()->bind(RedirectRepository::class, function () use ($mockRepository) {
             return $mockRepository;
@@ -56,7 +56,7 @@ describe('Repository Integration', function () {
         $response = $this->get(cp_route('abra-statamic-redirects.index'));
 
         $response->assertStatus(200);
-        
+
         // Verify the repository was called
         $mockRepository->shouldHaveReceived('all')->once();
     });
@@ -80,7 +80,7 @@ describe('Repository Integration', function () {
         // Mock repository for multiple calls
         $mockRepository = Mockery::mock(DatabaseRedirectRepository::class);
         $mockRepository->shouldReceive('all')->twice()->andReturn([]);
-        
+
         app()->bind(RedirectRepository::class, function () use ($mockRepository) {
             return $mockRepository;
         });

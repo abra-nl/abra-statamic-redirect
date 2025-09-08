@@ -21,7 +21,6 @@ class FileRedirectRepository implements RedirectRepository
 
     protected int $cache_expiry;
 
-
     public function __construct()
     {
         $this->path = Config::string('redirects.file_path');
@@ -166,9 +165,6 @@ class FileRedirectRepository implements RedirectRepository
 
     /**
      * Save redirects to YAML file
-     *
-     * @param array $redirects
-     * @return bool
      */
     protected function saveRedirects(array $redirects): bool
     {

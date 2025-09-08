@@ -1,33 +1,32 @@
 <?php
 
 use Abra\AbraStatamicRedirect\Interfaces\RedirectRepository;
-use Abra\AbraStatamicRedirect\Http\Controllers\RedirectController;
 use Statamic\Facades\User;
 
 beforeEach(function () {
     // Mock the RedirectRepository
     $this->redirectRepository = Mockery::mock(RedirectRepository::class);
     $this->app->instance(RedirectRepository::class, $this->redirectRepository);
-    
+
     // Create and authenticate a superuser for CP access
     $this->actingAs(User::make()
         ->email('test@example.com')
         ->makeSuper()
-        ->save()
+        ->save(),
     );
-    
+
     // Sample redirect data
     $this->sampleRedirect = [
         'id' => '123',
         'source' => '/old-page',
         'destination' => '/new-page',
-        'status_code' => 301
+        'status_code' => 301,
     ];
-    
+
     $this->validRedirectData = [
         'source' => '/test-source',
         'destination' => '/test-destination',
-        'status_code' => 301
+        'status_code' => 301,
     ];
 });
 
@@ -39,8 +38,8 @@ describe('RedirectController', function () {
                 'id' => '456',
                 'source' => '/another-old-page',
                 'destination' => '/another-new-page',
-                'status_code' => 302
-            ]
+                'status_code' => 302,
+            ],
         ];
 
         $this->redirectRepository
@@ -158,7 +157,7 @@ describe('RedirectController', function () {
         $updatedData = [
             'source' => '/updated-source',
             'destination' => '/updated-destination',
-            'status_code' => 302
+            'status_code' => 302,
         ];
 
         $this->redirectRepository

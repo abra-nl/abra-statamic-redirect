@@ -54,9 +54,6 @@ class RedirectMiddleware
 
     /**
      * Find a redirect for the given path
-     *
-     * @param  string  $path
-     * @return array|null
      */
     protected function findRedirectForPath(string $path): ?array
     {
