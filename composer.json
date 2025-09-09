@@ -55,7 +55,6 @@
         "test:coverage": "php -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --do-not-cache-result",
         "test:coverage-html": "php -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --coverage-html=coverage-html --do-not-cache-result",
         "test:coverage-clover": "php -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --coverage-clover=coverage.xml --do-not-cache-result",
-        "test:coverage-text": "php -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --coverage-text --do-not-cache-result",
         "test:min-coverage": "php -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --min=80 --do-not-cache-result",
         "pint": "./vendor/bin/pint",
         "pint:check": "./vendor/bin/pint --test",

@@ -23,13 +23,7 @@
             <directory>./src/vendor</directory>
         </exclude>
     </source>
-    <coverage includeUncoveredFiles="true" processUncoveredFiles="true" ignoreDeprecatedCodeUnits="true">
-        <include>
-            <directory suffix=".php">./src</directory>
-        </include>
-        <exclude>
-            <directory>./src/vendor</directory>
-        </exclude>
+    <coverage includeUncoveredFiles="true" ignoreDeprecatedCodeUnits="true">
         <report>
             <html outputDirectory="./coverage-html" lowUpperBound="50" highLowerBound="80"/>
             <clover outputFile="./coverage.xml"/>

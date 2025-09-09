@@ -79,8 +79,6 @@ composer test:coverage-html
 # Generate Clover XML coverage report (for CI/CD)
 composer test:coverage-clover
 
-# Generate text coverage report
-composer test:coverage-text
 
 # Enforce minimum coverage threshold (80%)
 composer test:min-coverage
@@ -94,13 +92,6 @@ The HTML report provides a visual, interactive coverage report:
 ```bash
 composer test:coverage-html
 # Open coverage-html/index.html in your browser
-```
-
-### Terminal Report
-For quick coverage overview:
-
-```bash
-composer test:coverage-text
 ```
 
 ### CI/CD Integration
