@@ -209,13 +209,13 @@ pipeline {
             echo 'Pipeline completed.'
             
             // Clean up workspace but keep important artifacts
-            /*cleanWs(
+            cleanWs(
                 cleanWhenNotBuilt: false,
                 deleteDirs: true,
                 disableDeferredWipeout: true,
                 notFailBuild: true,
                 patterns: [[pattern: '.composer-cache/**', type: 'EXCLUDE']]
-            )*/
+            )
         }
         
         success {
