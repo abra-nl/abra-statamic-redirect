@@ -51,7 +51,8 @@
     "scripts": {
         "test": "pest",
         "test:unit": "pest tests/Unit",
-        "test:feature": "pest tests/Feature", 
+        "test:feature": "pest tests/Feature",
+        "test:junit": "pest --log-junit tests/results.xml",
         "test:coverage": "php -d \"zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-83-arm64.so\" -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage",
         "test:coverage-html": "php -d \"zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-83-arm64.so\" -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --coverage-html=coverage-html",
         "test:coverage-clover": "php -d \"zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-83-arm64.so\" -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --coverage-clover=coverage.xml",
