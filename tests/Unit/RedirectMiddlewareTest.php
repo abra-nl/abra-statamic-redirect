@@ -32,7 +32,7 @@ describe('RedirectMiddleware', function (): void {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/test-path');
 
-        $response = $middleware->handle($request, fn($req): Response => new Response('Original content'));
+        $response = $middleware->handle($request, fn ($req): Response => new Response('Original content'));
 
         expect($response->getContent())->toBe('Original content');
         expect($response->getStatusCode())->toBe(200);
@@ -54,7 +54,7 @@ describe('RedirectMiddleware', function (): void {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/old-page');
 
-        $response = $middleware->handle($request, fn($req): Response => new Response('Should not reach here'));
+        $response = $middleware->handle($request, fn ($req): Response => new Response('Should not reach here'));
 
         expect($response->getStatusCode())->toBe(301);
         expect($response->getTargetUrl())->toBe('http://localhost/new-page');
@@ -69,7 +69,7 @@ describe('RedirectMiddleware', function (): void {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/cp/redirects');
 
-        $response = $middleware->handle($request, fn($req): Response => new Response('CP Content'));
+        $response = $middleware->handle($request, fn ($req): Response => new Response('CP Content'));
 
         expect($response->getContent())->toBe('CP Content');
         expect($response->getStatusCode())->toBe(200);
@@ -84,7 +84,7 @@ describe('RedirectMiddleware', function (): void {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/admin/dashboard');
 
-        $response = $middleware->handle($request, fn($req): Response => new Response('Admin Content'));
+        $response = $middleware->handle($request, fn ($req): Response => new Response('Admin Content'));
 
         expect($response->getContent())->toBe('Admin Content');
         expect($response->getStatusCode())->toBe(200);
@@ -106,7 +106,7 @@ describe('RedirectMiddleware', function (): void {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/old-page?utm_source=test&page=1');
 
-        $response = $middleware->handle($request, fn($req): Response => new Response('Should not reach here'));
+        $response = $middleware->handle($request, fn ($req): Response => new Response('Should not reach here'));
 
         expect($response->getStatusCode())->toBe(302);
         $targetUrl = $response->getTargetUrl();
@@ -131,7 +131,7 @@ describe('RedirectMiddleware', function (): void {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/old-page?new=param');
 
-        $response = $middleware->handle($request, fn($req): Response => new Response('Should not reach here'));
+        $response = $middleware->handle($request, fn ($req): Response => new Response('Should not reach here'));
 
         expect($response->getStatusCode())->toBe(301);
         expect($response->getTargetUrl())->toBe('http://localhost/new-page?existing=param&new=param');
@@ -153,7 +153,7 @@ describe('RedirectMiddleware', function (): void {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/');
 
-        $response = $middleware->handle($request, fn($req): Response => new Response('Should not reach here'));
+        $response = $middleware->handle($request, fn ($req): Response => new Response('Should not reach here'));
 
         expect($response->getStatusCode())->toBe(301);
         expect($response->getTargetUrl())->toBe('http://localhost/home');
@@ -171,7 +171,7 @@ describe('RedirectMiddleware', function (): void {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('test-path'); // No leading slash
 
-        $response = $middleware->handle($request, fn($req): Response => new Response('Original content'));
+        $response = $middleware->handle($request, fn ($req): Response => new Response('Original content'));
 
         expect($response->getContent())->toBe('Original content');
     });
@@ -201,7 +201,7 @@ describe('RedirectMiddleware', function (): void {
         $request = Request::create('/cached-page');
 
         // First request - should call repository and cache result
-        $response = $middleware->handle($request, fn($req): Response => new Response('Should not reach here'));
+        $response = $middleware->handle($request, fn ($req): Response => new Response('Should not reach here'));
 
         expect($response->getStatusCode())->toBe(301);
 
@@ -233,7 +233,7 @@ describe('RedirectMiddleware', function (): void {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/cached-page');
 
-        $response = $middleware->handle($request, fn($req): Response => new Response('Should not reach here'));
+        $response = $middleware->handle($request, fn ($req): Response => new Response('Should not reach here'));
 
         expect($response->getStatusCode())->toBe(302);
         expect($response->getTargetUrl())->toBe('http://localhost/cached-destination');
@@ -257,7 +257,7 @@ describe('RedirectMiddleware', function (): void {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/non-existent');
 
-        $response = $middleware->handle($request, fn($req): Response => new Response('Original content'));
+        $response = $middleware->handle($request, fn ($req): Response => new Response('Original content'));
 
         expect($response->getContent())->toBe('Original content');
 
@@ -274,21 +274,21 @@ describe('RedirectMiddleware', function (): void {
         foreach ($statusCodes as $statusCode) {
             $this->redirectRepository
                 ->shouldReceive('find')
-                ->with('/test-' . $statusCode)
+                ->with('/test-'.$statusCode)
                 ->once()
                 ->andReturn([
-                    'source' => '/test-' . $statusCode,
-                    'destination' => '/new-' . $statusCode,
+                    'source' => '/test-'.$statusCode,
+                    'destination' => '/new-'.$statusCode,
                     'status_code' => $statusCode,
                 ]);
 
             $middleware = new RedirectMiddleware($this->redirectRepository);
-            $request = Request::create('/test-' . $statusCode);
+            $request = Request::create('/test-'.$statusCode);
 
-            $response = $middleware->handle($request, fn($req): Response => new Response('Should not reach here'));
+            $response = $middleware->handle($request, fn ($req): Response => new Response('Should not reach here'));
 
             expect($response->getStatusCode())->toBe($statusCode);
-            expect($response->getTargetUrl())->toBe('http://localhost/new-' . $statusCode);
+            expect($response->getTargetUrl())->toBe('http://localhost/new-'.$statusCode);
         }
     });
 

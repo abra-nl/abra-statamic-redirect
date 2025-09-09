@@ -26,7 +26,7 @@ describe('Repository Integration', function (): void {
         ]);
 
         // Replace the bound repository
-        app()->bind(RedirectRepository::class, fn() => $mockRepository);
+        app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
         $response = $this->get(cp_route('abra-statamic-redirects.index'));
 
@@ -47,7 +47,7 @@ describe('Repository Integration', function (): void {
         ]);
 
         // Replace the bound repository
-        app()->bind(RedirectRepository::class, fn() => $mockRepository);
+        app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
         $response = $this->get(cp_route('abra-statamic-redirects.index'));
 
@@ -77,7 +77,7 @@ describe('Repository Integration', function (): void {
         $mockRepository = Mockery::mock(DatabaseRedirectRepository::class);
         $mockRepository->shouldReceive('all')->twice()->andReturn([]);
 
-        app()->bind(RedirectRepository::class, fn() => $mockRepository);
+        app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
         // Make multiple requests to the index (both call all())
         $this->get(cp_route('abra-statamic-redirects.index'));

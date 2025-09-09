@@ -1,8 +1,8 @@
 <?php
 
+use Abra\AbraStatamicRedirect\Interfaces\RedirectRepository;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Response;
-use Abra\AbraStatamicRedirect\Interfaces\RedirectRepository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\User;
@@ -28,13 +28,13 @@ describe('RedirectMiddleware Integration', function (): void {
                 'status_code' => 301,
             ]);
 
-        app()->bind(RedirectRepository::class, fn() => $mockRepository);
+        app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
         // Configure to disable cache for this test
         config(['redirects.cache.enabled' => false]);
 
         // Create a test route that should NOT be reached due to redirect
-        Route::get('/integration-test', fn(): ResponseFactory|Response => response('This should not be reached', 200));
+        Route::get('/integration-test', fn (): ResponseFactory|Response => response('This should not be reached', 200));
 
         // Make the request
         $response = $this->get('/integration-test');
@@ -51,7 +51,7 @@ describe('RedirectMiddleware Integration', function (): void {
             ->with('/normal-page')
             ->andReturn(null);
 
-        app()->bind(RedirectRepository::class, fn() => $mockRepository);
+        app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
         config(['redirects.cache.enabled' => false]);
 
@@ -77,7 +77,7 @@ describe('RedirectMiddleware Integration', function (): void {
         $mockRepository = Mockery::mock(RedirectRepository::class);
         $mockRepository->shouldNotReceive('find');
 
-        app()->bind(RedirectRepository::class, fn() => $mockRepository);
+        app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
         // Test with a generic CP path since the exact route behavior may vary
         $response = $this->get('/cp/test-path');
@@ -97,12 +97,12 @@ describe('RedirectMiddleware Integration', function (): void {
                 'status_code' => 302,
             ]);
 
-        app()->bind(RedirectRepository::class, fn() => $mockRepository);
+        app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
         config(['redirects.cache.enabled' => false]);
 
         // Create a test route (should not be reached)
-        Route::get('/query-test', fn(): ResponseFactory|Response => response('Should not reach here', 200));
+        Route::get('/query-test', fn (): ResponseFactory|Response => response('Should not reach here', 200));
 
         // Make request with query parameters
         $response = $this->get('/query-test?utm_source=newsletter&page=2');
@@ -127,7 +127,7 @@ describe('RedirectMiddleware Integration', function (): void {
                 'status_code' => 301,
             ]);
 
-        app()->bind(RedirectRepository::class, fn() => $mockRepository);
+        app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
         config(['redirects.cache.enabled' => false]);
 
@@ -161,9 +161,9 @@ describe('RedirectMiddleware Integration', function (): void {
                 'status_code' => 301,
             ]);
 
-        app()->bind(RedirectRepository::class, fn() => $mockRepository);
+        app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
-        Route::get('/cached-integration', fn(): ResponseFactory|Response => response('Should not reach here', 200));
+        Route::get('/cached-integration', fn (): ResponseFactory|Response => response('Should not reach here', 200));
 
         // First request - should call repository and cache
         $response1 = $this->get('/cached-integration');
@@ -190,11 +190,11 @@ describe('RedirectMiddleware Integration', function (): void {
                 'status_code' => 301,
             ]);
 
-        app()->bind(RedirectRepository::class, fn() => $mockRepository);
+        app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
         config(['redirects.cache.enabled' => false]);
 
-        Route::get('/blog/some-post', fn(): ResponseFactory|Response => response('Blog post', 200));
+        Route::get('/blog/some-post', fn (): ResponseFactory|Response => response('Blog post', 200));
 
         $response = $this->get('/blog/some-post');
 
@@ -212,11 +212,11 @@ describe('RedirectMiddleware Integration', function (): void {
                 'status_code' => 302,
             ]);
 
-        app()->bind(RedirectRepository::class, fn() => $mockRepository);
+        app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
         config(['redirects.cache.enabled' => false]);
 
-        Route::get('/', fn(): ResponseFactory|Response => response('Home page', 200));
+        Route::get('/', fn (): ResponseFactory|Response => response('Home page', 200));
 
         $response = $this->get('/');
 
@@ -230,23 +230,23 @@ describe('RedirectMiddleware Integration', function (): void {
         foreach ($statusCodes as $statusCode) {
             $mockRepository = Mockery::mock(RedirectRepository::class);
             $mockRepository->shouldReceive('find')
-                ->with('/status-' . $statusCode)
+                ->with('/status-'.$statusCode)
                 ->andReturn([
-                    'source' => '/status-' . $statusCode,
-                    'destination' => '/new-status-' . $statusCode,
+                    'source' => '/status-'.$statusCode,
+                    'destination' => '/new-status-'.$statusCode,
                     'status_code' => $statusCode,
                 ]);
 
-            app()->bind(RedirectRepository::class, fn() => $mockRepository);
+            app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
             config(['redirects.cache.enabled' => false]);
 
-            Route::get('/status-' . $statusCode, fn(): ResponseFactory|Response => response(sprintf('Status %s page', $statusCode), 200));
+            Route::get('/status-'.$statusCode, fn (): ResponseFactory|Response => response(sprintf('Status %s page', $statusCode), 200));
 
-            $response = $this->get('/status-' . $statusCode);
+            $response = $this->get('/status-'.$statusCode);
 
             $response->assertStatus($statusCode);
-            $response->assertRedirect('/new-status-' . $statusCode);
+            $response->assertRedirect('/new-status-'.$statusCode);
         }
     });
 
@@ -260,11 +260,11 @@ describe('RedirectMiddleware Integration', function (): void {
                 'status_code' => 301,
             ]);
 
-        app()->bind(RedirectRepository::class, fn() => $mockRepository);
+        app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
         config(['redirects.cache.enabled' => false]);
 
-        Route::get('/complex-query', fn(): ResponseFactory|Response => response('Complex page', 200));
+        Route::get('/complex-query', fn (): ResponseFactory|Response => response('Complex page', 200));
 
         // Request with additional query parameters
         $response = $this->get('/complex-query?utm_campaign=test&source=email&page=5');

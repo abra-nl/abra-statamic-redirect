@@ -11,8 +11,8 @@
 | need to change it using the "pest()" function to bind a different classes or traits.
 |
 */
-use Illuminate\Contracts\Console\Kernel;
 use Abra\AbraStatamicRedirect\Tests\TestCase;
+use Illuminate\Contracts\Console\Kernel;
 
 pest()->extend(TestCase::class)
  // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
@@ -29,7 +29,7 @@ pest()->extend(TestCase::class)
 |
 */
 
-expect()->extend('toBeOne', fn() => $this->toBe(1));
+expect()->extend('toBeOne', fn () => $this->toBe(1));
 
 /*
 |--------------------------------------------------------------------------

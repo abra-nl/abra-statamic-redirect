@@ -10,9 +10,7 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class RedirectController extends CpController
 {
-    public function __construct(protected RedirectRepository $redirects)
-    {
-    }
+    public function __construct(protected RedirectRepository $redirects) {}
 
     /**
      * Display a listing of redirects

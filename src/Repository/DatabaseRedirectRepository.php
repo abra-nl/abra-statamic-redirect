@@ -42,7 +42,7 @@ class DatabaseRedirectRepository implements RedirectRepository
         $redirects = DB::table($this->table)
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(fn($item): array => (array) $item)
+            ->map(fn ($item): array => (array) $item)
             ->toArray();
 
         if ($this->cache_enabled) {
