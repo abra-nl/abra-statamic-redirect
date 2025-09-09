@@ -4,43 +4,6 @@ This project uses [Pest](https://pestphp.com/) for testing, which provides an el
 
 ## Prerequisites
 
-### For Laravel Herd Pro Users (Recommended)
-
-If you're using **Laravel Herd Pro**, Xdebug is already included! The composer scripts are pre-configured to work with Herd's Xdebug installation.
-
-No additional setup required - just run the coverage commands below.
-
-### For Other Environments
-
-To generate code coverage reports, you need either **Xdebug** or **PCOV** installed:
-
-#### Installing Xdebug (Recommended for development)
-
-```bash
-# macOS with Homebrew
-brew install php@8.1-xdebug  # or your PHP version
-# or
-pecl install xdebug
-
-# Ubuntu/Debian
-sudo apt-get install php-xdebug
-
-# Enable in php.ini
-zend_extension=xdebug.so
-xdebug.mode=coverage
-```
-
-#### Installing PCOV (Faster for CI/CD)
-
-```bash
-# Using PECL
-pecl install pcov
-
-# Enable in php.ini  
-extension=pcov.so
-pcov.enabled=1
-```
-
 ## Running Tests
 
 ### Basic Test Commands
@@ -57,49 +20,11 @@ composer test:unit
 # Run only feature tests  
 composer test:feature
 
-# Run tests with verbose output
-./vendor/bin/pest --verbose
-
 # Run specific test file
 ./vendor/bin/pest tests/Unit/DatabaseTableConfigurationTest.php
 
 # Run tests matching a pattern
 ./vendor/bin/pest --filter="RedirectController"
-```
-
-### Code Coverage Commands
-
-```bash
-# Generate coverage report in terminal
-composer test:coverage
-
-# Generate HTML coverage report (opens in browser)
-composer test:coverage-html
-
-# Generate Clover XML coverage report (for CI/CD)
-composer test:coverage-clover
-
-
-# Enforce minimum coverage threshold (80%)
-composer test:min-coverage
-```
-
-## Code Coverage Reports
-
-### HTML Report
-The HTML report provides a visual, interactive coverage report:
-
-```bash
-composer test:coverage-html
-# Open coverage-html/index.html in your browser
-```
-
-### CI/CD Integration
-For automated testing pipelines:
-
-```bash
-composer test:coverage-clover
-# Generates coverage.xml for services like CodeClimate, Coveralls, etc.
 ```
 
 ## Test Structure
@@ -131,12 +56,6 @@ The project is organized into test suites:
 - `tests/Pest.php`: Pest-specific configuration and global functions
 - `tests/TestCase.php`: Base test class with Statamic setup
 
-## Coverage Goals
-
-- **Minimum Coverage**: 80% (enforced by `composer test:min-coverage`)
-- **Good Coverage**: 90%+
-- **Excellent Coverage**: 95%+
-
 ## Writing Tests
 
 ### Example Unit Test
@@ -166,33 +85,8 @@ test('creates redirect through controller', function () {
 });
 ```
 
-## Continuous Integration
-
-For GitHub Actions, GitLab CI, or other CI services:
-
-```yaml
-- name: Run tests with coverage
-  run: composer test:coverage-clover
-
-- name: Upload coverage to Codecov
-  uses: codecov/codecov-action@v1
-  with:
-    file: ./coverage.xml
-```
-
 ## Troubleshooting
 
-### "No code coverage driver available"
-- Install Xdebug or PCOV (see Prerequisites above)
-- Verify installation: `php -m | grep -E "(xdebug|pcov)"`
-
-### Coverage reports are empty
-- Ensure your tests are actually running your source code
-- Check that the `src/` directory paths are correct in `pest.xml`
-
-### Tests are slow with coverage
-- Use PCOV instead of Xdebug for faster coverage collection
-- Run coverage only when needed, not during development
 
 ## Additional Resources
 
