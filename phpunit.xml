@@ -17,10 +17,7 @@
             <directory>src</directory>
         </include>
     </source>
-    <coverage processUncoveredFiles="true">
-        <include>
-            <directory suffix=".php">src</directory>
-        </include>
+    <coverage>
         <report>
             <html outputDirectory="build/coverage"/>
             <clover outputFile="build/coverage/clover.xml"/>
