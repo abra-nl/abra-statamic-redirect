@@ -11,6 +11,9 @@ coverage.xml
 coverage.txt
 .coverage/
 
+# Test results
+tests/results.xml
+
 # Static analysis and code quality tools
 phpstan-baseline.neon
 .phpstan-cache/
