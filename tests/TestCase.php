@@ -4,12 +4,9 @@ namespace Abra\AbraStatamicRedirect\Tests;
 
 use Abra\AbraStatamicRedirect\ServiceProvider;
 use Statamic\Testing\AddonTestCase;
-use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 class TestCase extends AddonTestCase
 {
-    use PreventsSavingStacheItemsToDisk;
-
     protected string $addonServiceProvider = ServiceProvider::class;
 
     protected function resolveApplicationConfiguration($app): void
