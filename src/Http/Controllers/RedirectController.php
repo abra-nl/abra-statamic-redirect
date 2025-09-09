@@ -10,11 +10,8 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class RedirectController extends CpController
 {
-    protected RedirectRepository $redirects;
-
-    public function __construct(RedirectRepository $redirects)
+    public function __construct(protected RedirectRepository $redirects)
     {
-        $this->redirects = $redirects;
     }
 
     /**
@@ -109,10 +106,9 @@ class RedirectController extends CpController
     /**
      * Delete a redirect
      *
-     * @param  string  $id
      * @return RedirectResponse
      */
-    public function destroy($id)
+    public function destroy(string $id)
     {
         $this->redirects->delete($id);
 

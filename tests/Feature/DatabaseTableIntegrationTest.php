@@ -1,9 +1,10 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Statamic\Facades\User;
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create and authenticate a superuser for CP access
     $this->actingAs(User::make()
         ->email('test@example.com')
@@ -12,8 +13,8 @@ beforeEach(function () {
     );
 });
 
-describe('Database Table Integration', function () {
-    test('full integration test with custom table name from config to controller', function () {
+describe('Database Table Integration', function (): void {
+    test('full integration test with custom table name from config to controller', function (): void {
         $customTableName = 'integration_test_redirects';
 
         // Configure custom table name
@@ -47,7 +48,7 @@ describe('Database Table Integration', function () {
         $response->assertRedirect(cp_route('abra-statamic-redirects.index'));
 
         // Verify the redirect was stored in the custom table
-        $tableData = \Illuminate\Support\Facades\DB::table($customTableName)->first();
+        $tableData = DB::table($customTableName)->first();
         expect($tableData)->not->toBeNull();
         expect($tableData->source)->toBe('/integration-test-source');
         expect($tableData->destination)->toBe('/integration-test-destination');
@@ -75,7 +76,7 @@ describe('Database Table Integration', function () {
         $response->assertRedirect(cp_route('abra-statamic-redirects.index'));
 
         // Verify the update in custom table
-        $updatedData = \Illuminate\Support\Facades\DB::table($customTableName)->where('id', $redirectId)->first();
+        $updatedData = DB::table($customTableName)->where('id', $redirectId)->first();
         expect($updatedData->destination)->toBe('/updated-destination');
         expect($updatedData->status_code)->toBe(302);
 
@@ -84,7 +85,7 @@ describe('Database Table Integration', function () {
         $response->assertRedirect(cp_route('abra-statamic-redirects.index'));
 
         // Verify deletion from custom table
-        $deletedData = \Illuminate\Support\Facades\DB::table($customTableName)->where('id', $redirectId)->first();
+        $deletedData = DB::table($customTableName)->where('id', $redirectId)->first();
         expect($deletedData)->toBeNull();
 
         // Clean up

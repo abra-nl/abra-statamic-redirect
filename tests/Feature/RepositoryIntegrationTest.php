@@ -5,7 +5,7 @@ use Abra\AbraStatamicRedirect\Repository\DatabaseRedirectRepository;
 use Abra\AbraStatamicRedirect\Repository\FileRedirectRepository;
 use Statamic\Facades\User;
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create and authenticate a superuser for CP access
     $this->actingAs(User::make()
         ->email('test@example.com')
@@ -14,8 +14,8 @@ beforeEach(function () {
     );
 });
 
-describe('Repository Integration', function () {
-    test('controller uses file repository when configured for file storage', function () {
+describe('Repository Integration', function (): void {
+    test('controller uses file repository when configured for file storage', function (): void {
         config(['redirects.storage' => 'file']);
         config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
 
@@ -26,9 +26,7 @@ describe('Repository Integration', function () {
         ]);
 
         // Replace the bound repository
-        app()->bind(RedirectRepository::class, function () use ($mockRepository) {
-            return $mockRepository;
-        });
+        app()->bind(RedirectRepository::class, fn() => $mockRepository);
 
         $response = $this->get(cp_route('abra-statamic-redirects.index'));
 
@@ -38,7 +36,7 @@ describe('Repository Integration', function () {
         $mockRepository->shouldHaveReceived('all')->once();
     });
 
-    test('controller uses database repository when configured for database storage', function () {
+    test('controller uses database repository when configured for database storage', function (): void {
         config(['redirects.storage' => 'database']);
         config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
 
@@ -49,9 +47,7 @@ describe('Repository Integration', function () {
         ]);
 
         // Replace the bound repository
-        app()->bind(RedirectRepository::class, function () use ($mockRepository) {
-            return $mockRepository;
-        });
+        app()->bind(RedirectRepository::class, fn() => $mockRepository);
 
         $response = $this->get(cp_route('abra-statamic-redirects.index'));
 
@@ -61,7 +57,7 @@ describe('Repository Integration', function () {
         $mockRepository->shouldHaveReceived('all')->once();
     });
 
-    test('service provider binding resolves correct repository type during request', function () {
+    test('service provider binding resolves correct repository type during request', function (): void {
         // Test file storage
         config(['redirects.storage' => 'file']);
         $repository = app(RedirectRepository::class);
@@ -73,7 +69,7 @@ describe('Repository Integration', function () {
         expect($repository)->toBeInstanceOf(DatabaseRedirectRepository::class);
     });
 
-    test('repository configuration persists across multiple controller actions', function () {
+    test('repository configuration persists across multiple controller actions', function (): void {
         config(['redirects.storage' => 'database']);
         config(['redirects.status_codes' => [301 => 'Permanent']]);
 
@@ -81,9 +77,7 @@ describe('Repository Integration', function () {
         $mockRepository = Mockery::mock(DatabaseRedirectRepository::class);
         $mockRepository->shouldReceive('all')->twice()->andReturn([]);
 
-        app()->bind(RedirectRepository::class, function () use ($mockRepository) {
-            return $mockRepository;
-        });
+        app()->bind(RedirectRepository::class, fn() => $mockRepository);
 
         // Make multiple requests to the index (both call all())
         $this->get(cp_route('abra-statamic-redirects.index'));

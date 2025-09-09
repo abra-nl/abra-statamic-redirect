@@ -9,20 +9,16 @@ use Illuminate\Support\Facades\Cache;
 
 class RedirectMiddleware
 {
-    protected RedirectRepository $redirects;
-
     protected bool $cache_enabled;
 
     protected int $cache_expiry;
 
-    public function __construct(RedirectRepository $redirects)
+    public function __construct(protected RedirectRepository $redirects)
     {
         /** @var bool $cacheEnabled */
         $cacheEnabled = config('redirects.cache.enabled', false);
         /** @var int $cacheExpiry */
         $cacheExpiry = config('redirects.cache.expiry', 60);
-
-        $this->redirects = $redirects;
         $this->cache_enabled = $cacheEnabled;
         $this->cache_expiry = $cacheExpiry;
     }
@@ -81,7 +77,7 @@ class RedirectMiddleware
     protected function normalizePath(string $path): string
     {
         // If root path, return /
-        if (empty($path)) {
+        if ($path === '' || $path === '0') {
             return '/';
         }
 

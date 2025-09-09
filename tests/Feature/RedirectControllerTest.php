@@ -3,7 +3,7 @@
 use Abra\AbraStatamicRedirect\Interfaces\RedirectRepository;
 use Statamic\Facades\User;
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Mock the RedirectRepository
     $this->redirectRepository = Mockery::mock(RedirectRepository::class);
     $this->app->instance(RedirectRepository::class, $this->redirectRepository);
@@ -30,8 +30,8 @@ beforeEach(function () {
     ];
 });
 
-describe('RedirectController', function () {
-    test('index displays list of redirects', function () {
+describe('RedirectController', function (): void {
+    test('index displays list of redirects', function (): void {
         $redirects = [
             $this->sampleRedirect,
             [
@@ -57,7 +57,7 @@ describe('RedirectController', function () {
         $response->assertViewHas('statusCodes', [301 => 'Permanent', 302 => 'Temporary']);
     });
 
-    test('create displays create form', function () {
+    test('create displays create form', function (): void {
         config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
 
         $response = $this->get(cp_route('abra-statamic-redirects.create'));
@@ -67,7 +67,7 @@ describe('RedirectController', function () {
         $response->assertViewHas('statusCodes', [301 => 'Permanent', 302 => 'Temporary']);
     });
 
-    test('store creates new redirect successfully', function () {
+    test('store creates new redirect successfully', function (): void {
         config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
 
         $this->redirectRepository
@@ -88,7 +88,7 @@ describe('RedirectController', function () {
         $response->assertSessionHas('success', 'Redirect created successfully.');
     });
 
-    test('store fails when source already exists', function () {
+    test('store fails when source already exists', function (): void {
         config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
 
         $this->redirectRepository
@@ -103,7 +103,7 @@ describe('RedirectController', function () {
         $response->assertSessionHasErrors(['source' => 'A redirect with this source URL already exists.']);
     });
 
-    test('store validates required fields', function () {
+    test('store validates required fields', function (): void {
         config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
 
         $response = $this->post(cp_route('abra-statamic-redirects.store'));
@@ -111,7 +111,7 @@ describe('RedirectController', function () {
         $response->assertSessionHasErrors(['source', 'destination', 'status_code']);
     });
 
-    test('store validates status code is in allowed list', function () {
+    test('store validates status code is in allowed list', function (): void {
         config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
 
         $invalidData = array_merge($this->validRedirectData, ['status_code' => 999]);
@@ -121,7 +121,7 @@ describe('RedirectController', function () {
         $response->assertSessionHasErrors(['status_code']);
     });
 
-    test('edit displays edit form for existing redirect', function () {
+    test('edit displays edit form for existing redirect', function (): void {
         config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
 
         $redirects = [$this->sampleRedirect];
@@ -139,7 +139,7 @@ describe('RedirectController', function () {
         $response->assertViewHas('statusCodes', [301 => 'Permanent', 302 => 'Temporary']);
     });
 
-    test('edit redirects when redirect not found', function () {
+    test('edit redirects when redirect not found', function (): void {
         $this->redirectRepository
             ->shouldReceive('all')
             ->once()
@@ -151,7 +151,7 @@ describe('RedirectController', function () {
         $response->assertSessionHas('error', 'Redirect not found.');
     });
 
-    test('update modifies existing redirect successfully', function () {
+    test('update modifies existing redirect successfully', function (): void {
         config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
 
         $updatedData = [
@@ -178,7 +178,7 @@ describe('RedirectController', function () {
         $response->assertSessionHas('success', 'Redirect updated successfully.');
     });
 
-    test('update fails when source already exists for different redirect', function () {
+    test('update fails when source already exists for different redirect', function (): void {
         config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
 
         $this->redirectRepository
@@ -193,7 +193,7 @@ describe('RedirectController', function () {
         $response->assertSessionHasErrors(['source' => 'A redirect with this source URL already exists.']);
     });
 
-    test('update validates required fields', function () {
+    test('update validates required fields', function (): void {
         config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
 
         $response = $this->patch(cp_route('abra-statamic-redirects.update', ['id' => '123']));
@@ -201,7 +201,7 @@ describe('RedirectController', function () {
         $response->assertSessionHasErrors(['source', 'destination', 'status_code']);
     });
 
-    test('destroy deletes redirect successfully', function () {
+    test('destroy deletes redirect successfully', function (): void {
         $this->redirectRepository
             ->shouldReceive('delete')
             ->with('123')

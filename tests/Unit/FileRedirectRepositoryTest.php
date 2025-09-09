@@ -1,11 +1,12 @@
 <?php
 
+use Carbon\Carbon;
 use Abra\AbraStatamicRedirect\Repository\FileRedirectRepository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Statamic\Facades\YAML;
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create a temporary directory for test files
     $this->testDir = storage_path('tests/redirects');
     $this->testFile = $this->testDir.'/redirects.yaml';
@@ -26,7 +27,7 @@ beforeEach(function () {
     Cache::flush();
 });
 
-afterEach(function () {
+afterEach(function (): void {
     // Clean up test files
     if (File::exists($this->testDir)) {
         File::deleteDirectory($this->testDir);
@@ -36,9 +37,9 @@ afterEach(function () {
     Cache::flush();
 });
 
-describe('FileRedirectRepository', function () {
-    describe('constructor', function () {
-        test('creates directory and file if they do not exist', function () {
+describe('FileRedirectRepository', function (): void {
+    describe('constructor', function (): void {
+        test('creates directory and file if they do not exist', function (): void {
             expect(File::exists($this->testDir))->toBeFalse()
                 ->and(File::exists($this->testFile))->toBeFalse();
 
@@ -49,7 +50,7 @@ describe('FileRedirectRepository', function () {
                 ->and(File::get($this->testFile))->toBe("# Redirects\n");
         });
 
-        test('does not overwrite existing file', function () {
+        test('does not overwrite existing file', function (): void {
             File::makeDirectory($this->testDir, 0755, true);
             File::put($this->testFile, "existing content\n");
 
@@ -58,7 +59,7 @@ describe('FileRedirectRepository', function () {
             expect(File::get($this->testFile))->toBe("existing content\n");
         });
 
-        test('reads cache configuration correctly', function () {
+        test('reads cache configuration correctly', function (): void {
             config([
                 'redirects.cache_enabled' => true,
                 'redirects.cache_expiry' => 120,
@@ -77,14 +78,14 @@ describe('FileRedirectRepository', function () {
         });
     });
 
-    describe('all', function () {
-        test('returns empty array for empty file', function () {
+    describe('all', function (): void {
+        test('returns empty array for empty file', function (): void {
             $repository = new FileRedirectRepository;
 
             expect($repository->all())->toBe([]);
         });
 
-        test('returns redirects from YAML file', function () {
+        test('returns redirects from YAML file', function (): void {
             $redirects = [
                 [
                     'id' => 'test-1',
@@ -112,7 +113,7 @@ describe('FileRedirectRepository', function () {
             expect($repository->all())->toBe($redirects);
         });
 
-        test('handles corrupted YAML file gracefully', function () {
+        test('handles corrupted YAML file gracefully', function (): void {
             File::makeDirectory($this->testDir, 0755, true);
             File::put($this->testFile, 'invalid: yaml: content: [[[');
 
@@ -121,7 +122,7 @@ describe('FileRedirectRepository', function () {
             expect($repository->all())->toBe([]);
         });
 
-        test('caches results when cache is enabled', function () {
+        test('caches results when cache is enabled', function (): void {
             config(['redirects.cache_enabled' => true]);
 
             $redirects = [
@@ -153,7 +154,7 @@ describe('FileRedirectRepository', function () {
             expect($result2)->toBe($redirects); // Still the cached version
         });
 
-        test('uses cached results when available', function () {
+        test('uses cached results when available', function (): void {
             config(['redirects.cache_enabled' => true]);
 
             $cachedRedirects = [
@@ -177,8 +178,8 @@ describe('FileRedirectRepository', function () {
         });
     });
 
-    describe('find', function () {
-        beforeEach(function () {
+    describe('find', function (): void {
+        beforeEach(function (): void {
             $this->redirects = [
                 [
                     'id' => 'exact-1',
@@ -210,7 +211,7 @@ describe('FileRedirectRepository', function () {
             File::put($this->testFile, YAML::dump($this->redirects));
         });
 
-        test('finds exact matches', function () {
+        test('finds exact matches', function (): void {
             $repository = new FileRedirectRepository;
 
             $result = $repository->find('/exact-match');
@@ -218,7 +219,7 @@ describe('FileRedirectRepository', function () {
             expect($result)->toBe($this->redirects[0]);
         });
 
-        test('normalizes URLs for matching', function () {
+        test('normalizes URLs for matching', function (): void {
             $repository = new FileRedirectRepository;
 
             // Should find match despite trailing slash difference
@@ -227,7 +228,7 @@ describe('FileRedirectRepository', function () {
             expect($result)->toBe($this->redirects[2]);
         });
 
-        test('finds wildcard matches', function () {
+        test('finds wildcard matches', function (): void {
             $repository = new FileRedirectRepository;
 
             $result = $repository->find('/blog/my-post');
@@ -235,7 +236,7 @@ describe('FileRedirectRepository', function () {
             expect($result)->toBe($this->redirects[1]);
         });
 
-        test('returns null when no match is found', function () {
+        test('returns null when no match is found', function (): void {
             $repository = new FileRedirectRepository;
 
             $result = $repository->find('/non-existent-page');
@@ -243,7 +244,7 @@ describe('FileRedirectRepository', function () {
             expect($result)->toBeNull();
         });
 
-        test('prioritizes exact matches over wildcard matches', function () {
+        test('prioritizes exact matches over wildcard matches', function (): void {
             $redirects = [
                 [
                     'id' => 'wildcard-first',
@@ -272,7 +273,7 @@ describe('FileRedirectRepository', function () {
             expect($result['id'])->toBe('exact-second');
         });
 
-        test('handles multiple wildcard patterns', function () {
+        test('handles multiple wildcard patterns', function (): void {
             $redirects = [
                 [
                     'id' => 'api-wildcard',
@@ -301,8 +302,8 @@ describe('FileRedirectRepository', function () {
         });
     });
 
-    describe('store', function () {
-        test('adds new redirect to empty file', function () {
+    describe('store', function (): void {
+        test('adds new redirect to empty file', function (): void {
             $repository = new FileRedirectRepository;
 
             $data = [
@@ -325,7 +326,7 @@ describe('FileRedirectRepository', function () {
             expect($allRedirects[0]['id'])->toBe($result['id']);
         });
 
-        test('adds redirect to existing redirects', function () {
+        test('adds redirect to existing redirects', function (): void {
             $existingRedirects = [
                 [
                     'id' => 'existing-1',
@@ -356,7 +357,7 @@ describe('FileRedirectRepository', function () {
             expect($allRedirects[1]['id'])->toBe($result['id']);
         });
 
-        test('generates unique UUID for each redirect', function () {
+        test('generates unique UUID for each redirect', function (): void {
             $repository = new FileRedirectRepository;
 
             $result1 = $repository->store([
@@ -374,7 +375,7 @@ describe('FileRedirectRepository', function () {
                 ->and($result1['id'])->not->toBe($result2['id']);
         });
 
-        test('sets timestamps on creation', function () {
+        test('sets timestamps on creation', function (): void {
             $repository = new FileRedirectRepository;
 
             $before = now()->subSecond();
@@ -388,11 +389,11 @@ describe('FileRedirectRepository', function () {
                 ->and($result['updated_at'])->toBeString()
                 ->and($result['created_at'])->toBe($result['updated_at']);
 
-            $createdAt = \Carbon\Carbon::parse($result['created_at']);
+            $createdAt = Carbon::parse($result['created_at']);
             expect($createdAt->between($before, $after))->toBeTrue();
         });
 
-        test('clears cache when cache is enabled', function () {
+        test('clears cache when cache is enabled', function (): void {
             config(['redirects.cache_enabled' => true]);
 
             $repository = new FileRedirectRepository;
@@ -410,8 +411,8 @@ describe('FileRedirectRepository', function () {
         });
     });
 
-    describe('update', function () {
-        beforeEach(function () {
+    describe('update', function (): void {
+        beforeEach(function (): void {
             $this->existingRedirects = [
                 [
                     'id' => 'update-test-1',
@@ -435,7 +436,7 @@ describe('FileRedirectRepository', function () {
             File::put($this->testFile, YAML::dump($this->existingRedirects));
         });
 
-        test('updates existing redirect completely', function () {
+        test('updates existing redirect completely', function (): void {
             $repository = new FileRedirectRepository;
 
             $updateData = [
@@ -460,7 +461,7 @@ describe('FileRedirectRepository', function () {
             expect($allRedirects[0])->toBe($result);
         });
 
-        test('updates redirect partially', function () {
+        test('updates redirect partially', function (): void {
             $repository = new FileRedirectRepository;
 
             $updateData = [
@@ -475,7 +476,7 @@ describe('FileRedirectRepository', function () {
                 ->and($result['status_code'])->toBe(301); // Unchanged
         });
 
-        test('updates timestamp on modification', function () {
+        test('updates timestamp on modification', function (): void {
             $repository = new FileRedirectRepository;
 
             $before = now()->subSecond();
@@ -484,11 +485,11 @@ describe('FileRedirectRepository', function () {
 
             expect($result['created_at'])->toBe('2023-01-01T00:00:00+00:00'); // Unchanged
 
-            $updatedAt = \Carbon\Carbon::parse($result['updated_at']);
+            $updatedAt = Carbon::parse($result['updated_at']);
             expect($updatedAt->between($before, $after))->toBeTrue();
         });
 
-        test('returns empty array when ID not found', function () {
+        test('returns empty array when ID not found', function (): void {
             $repository = new FileRedirectRepository;
 
             $result = $repository->update('non-existent-id', [
@@ -502,7 +503,7 @@ describe('FileRedirectRepository', function () {
             expect($allRedirects)->toBe($this->existingRedirects);
         });
 
-        test('clears cache when cache is enabled', function () {
+        test('clears cache when cache is enabled', function (): void {
             config(['redirects.cache_enabled' => true]);
 
             $repository = new FileRedirectRepository;
@@ -517,8 +518,8 @@ describe('FileRedirectRepository', function () {
         });
     });
 
-    describe('delete', function () {
-        beforeEach(function () {
+    describe('delete', function (): void {
+        beforeEach(function (): void {
             $this->redirectsForDeletion = [
                 [
                     'id' => 'delete-test-1',
@@ -550,7 +551,7 @@ describe('FileRedirectRepository', function () {
             File::put($this->testFile, YAML::dump($this->redirectsForDeletion));
         });
 
-        test('deletes existing redirect successfully', function () {
+        test('deletes existing redirect successfully', function (): void {
             $repository = new FileRedirectRepository;
 
             $result = $repository->delete('delete-test-1');
@@ -563,7 +564,7 @@ describe('FileRedirectRepository', function () {
             expect($remaining[1]['id'])->toBe('delete-test-3');
         });
 
-        test('returns false when ID not found', function () {
+        test('returns false when ID not found', function (): void {
             $repository = new FileRedirectRepository;
 
             $result = $repository->delete('non-existent-id');
@@ -575,7 +576,7 @@ describe('FileRedirectRepository', function () {
             expect($allRedirects)->toHaveCount(3);
         });
 
-        test('re-indexes array after deletion', function () {
+        test('re-indexes array after deletion', function (): void {
             $repository = new FileRedirectRepository;
 
             // Delete middle item
@@ -588,7 +589,7 @@ describe('FileRedirectRepository', function () {
             expect(array_keys($remaining))->toBe([0, 1]);
         });
 
-        test('clears cache when cache is enabled', function () {
+        test('clears cache when cache is enabled', function (): void {
             config(['redirects.cache_enabled' => true]);
 
             $repository = new FileRedirectRepository;
@@ -603,8 +604,8 @@ describe('FileRedirectRepository', function () {
         });
     });
 
-    describe('exists', function () {
-        beforeEach(function () {
+    describe('exists', function (): void {
+        beforeEach(function (): void {
             $this->redirectsForExistence = [
                 [
                     'id' => 'exists-test-1',
@@ -628,19 +629,19 @@ describe('FileRedirectRepository', function () {
             File::put($this->testFile, YAML::dump($this->redirectsForExistence));
         });
 
-        test('returns true for existing source', function () {
+        test('returns true for existing source', function (): void {
             $repository = new FileRedirectRepository;
 
             expect($repository->exists('/existing-source'))->toBeTrue();
         });
 
-        test('returns false for non-existing source', function () {
+        test('returns false for non-existing source', function (): void {
             $repository = new FileRedirectRepository;
 
             expect($repository->exists('/non-existing-source'))->toBeFalse();
         });
 
-        test('normalizes URLs for existence check', function () {
+        test('normalizes URLs for existence check', function (): void {
             $repository = new FileRedirectRepository;
 
             // Should find match despite trailing slash difference
@@ -648,7 +649,7 @@ describe('FileRedirectRepository', function () {
             expect($repository->exists('/another-source/'))->toBeTrue(); // With trailing slash
         });
 
-        test('excludes specific ID from check', function () {
+        test('excludes specific ID from check', function (): void {
             $repository = new FileRedirectRepository;
 
             expect($repository->exists('/existing-source'))->toBeTrue() // Without exclusion - should exist
@@ -656,7 +657,7 @@ describe('FileRedirectRepository', function () {
                 ->and($repository->exists('/existing-source', 'different-id'))->toBeTrue(); // Different ID exclusion - should still exist
         });
 
-        test('handles empty redirects file', function () {
+        test('handles empty redirects file', function (): void {
             File::put($this->testFile, YAML::dump([]));
 
             $repository = new FileRedirectRepository;
@@ -665,8 +666,8 @@ describe('FileRedirectRepository', function () {
         });
     });
 
-    describe('file operations error handling', function () {
-        test('handles missing file directory gracefully', function () {
+    describe('file operations error handling', function (): void {
+        test('handles missing file directory gracefully', function (): void {
             // Use a path that doesn't exist
             $nonExistentPath = '/tmp/non-existent-dir/redirects.yaml';
 
@@ -678,7 +679,7 @@ describe('FileRedirectRepository', function () {
             expect($repository->all())->toBe([]);
         });
 
-        test('handles file read errors gracefully', function () {
+        test('handles file read errors gracefully', function (): void {
             // Create a file that will cause read issues
             File::makeDirectory($this->testDir, 0755, true);
             File::put($this->testFile, 'invalid yaml content: [[[[[');
@@ -689,7 +690,7 @@ describe('FileRedirectRepository', function () {
             expect($repository->all())->toBe([]);
         });
 
-        test('creates initial file with proper content', function () {
+        test('creates initial file with proper content', function (): void {
             $repository = new FileRedirectRepository;
 
             $content = File::get($this->testFile);
@@ -697,8 +698,8 @@ describe('FileRedirectRepository', function () {
         });
     });
 
-    describe('caching integration', function () {
-        test('invalidates cache on all write operations', function () {
+    describe('caching integration', function (): void {
+        test('invalidates cache on all write operations', function (): void {
             config(['redirects.cache_enabled' => true]);
 
             $repository = new FileRedirectRepository;

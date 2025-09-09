@@ -19,43 +19,43 @@ class TestClassWithWildcardPatterns
     }
 }
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->testClass = new TestClassWithWildcardPatterns;
 });
 
-describe('ConvertsWildcardPatterns', function () {
-    describe('normalizeUrl', function () {
-        test('removes trailing slashes from regular URLs', function () {
+describe('ConvertsWildcardPatterns', function (): void {
+    describe('normalizeUrl', function (): void {
+        test('removes trailing slashes from regular URLs', function (): void {
             expect($this->testClass->testNormalizeUrl('/test/'))->toBe('/test');
             expect($this->testClass->testNormalizeUrl('/test/path/'))->toBe('/test/path');
             expect($this->testClass->testNormalizeUrl('/test/path///'))->toBe('/test/path');
         });
 
-        test('preserves root URL as single slash', function () {
+        test('preserves root URL as single slash', function (): void {
             expect($this->testClass->testNormalizeUrl('/'))->toBe('/');
             expect($this->testClass->testNormalizeUrl('//'))->toBe('/');
             expect($this->testClass->testNormalizeUrl(''))->toBe('/');
         });
 
-        test('handles URLs without trailing slashes', function () {
+        test('handles URLs without trailing slashes', function (): void {
             expect($this->testClass->testNormalizeUrl('/test'))->toBe('/test');
             expect($this->testClass->testNormalizeUrl('/test/path'))->toBe('/test/path');
         });
 
-        test('handles URLs with multiple segments', function () {
+        test('handles URLs with multiple segments', function (): void {
             expect($this->testClass->testNormalizeUrl('/blog/posts/2023/'))->toBe('/blog/posts/2023');
             expect($this->testClass->testNormalizeUrl('/api/v1/users/'))->toBe('/api/v1/users');
         });
     });
 
-    describe('wildcardToRegex', function () {
-        describe('patterns ending with /*', function () {
-            test('creates regex for simple wildcard patterns', function () {
+    describe('wildcardToRegex', function (): void {
+        describe('patterns ending with /*', function (): void {
+            test('creates regex for simple wildcard patterns', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/blog/*');
                 expect($regex)->toBe('/^\/blog(\/.*)?$/');
             });
 
-            test('matches paths exactly and with suffixes', function () {
+            test('matches paths exactly and with suffixes', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/blog/*');
 
                 // Should match the base path
@@ -72,7 +72,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect(preg_match($regex, '/other/blog'))->toBe(0);
             });
 
-            test('handles nested wildcard patterns', function () {
+            test('handles nested wildcard patterns', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/api/v1/*');
                 expect($regex)->toBe('/^\/api\/v1(\/.*)?$/');
 
@@ -82,7 +82,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect(preg_match($regex, '/api/v2/users'))->toBe(0);
             });
 
-            test('escapes special regex characters in base path', function () {
+            test('escapes special regex characters in base path', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/test.path/*');
                 expect($regex)->toBe('/^\/test\.path(\/.*)?$/');
 
@@ -91,7 +91,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect(preg_match($regex, '/testXpath'))->toBe(0);
             });
 
-            test('handles root wildcard pattern', function () {
+            test('handles root wildcard pattern', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/*');
                 expect($regex)->toBe('/^(\/.*)?$/');
 
@@ -102,8 +102,8 @@ describe('ConvertsWildcardPatterns', function () {
             });
         });
 
-        describe('patterns with wildcards in middle or beginning', function () {
-            test('handles wildcards in the middle of patterns', function () {
+        describe('patterns with wildcards in middle or beginning', function (): void {
+            test('handles wildcards in the middle of patterns', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/blog/*/comments');
                 expect($regex)->toBe('/^\/blog\/.*\/comments$/');
 
@@ -114,7 +114,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect(preg_match($regex, '/blog/post-1/replies'))->toBe(0);
             });
 
-            test('handles wildcards at the beginning of patterns', function () {
+            test('handles wildcards at the beginning of patterns', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('*/admin');
                 expect($regex)->toBe('/^.*\/admin$/');
 
@@ -124,7 +124,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect(preg_match($regex, '/admin/dashboard'))->toBe(0);
             });
 
-            test('handles multiple wildcards in pattern', function () {
+            test('handles multiple wildcards in pattern', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/*/api/*/data');
                 expect($regex)->toBe('/^\/.*\/api\/.*\/data$/');
 
@@ -135,7 +135,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect(preg_match($regex, '/api/users/data'))->toBe(0);
             });
 
-            test('escapes regex special characters with wildcards', function () {
+            test('escapes regex special characters with wildcards', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/test.*/file.txt');
                 expect($regex)->toBe('/^\/test\..*\/file\.txt$/');
 
@@ -145,8 +145,8 @@ describe('ConvertsWildcardPatterns', function () {
             });
         });
 
-        describe('patterns without wildcards', function () {
-            test('creates exact match regex for patterns without wildcards', function () {
+        describe('patterns without wildcards', function (): void {
+            test('creates exact match regex for patterns without wildcards', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/exact/path');
                 expect($regex)->toBe('/^\/exact\/path$/');
 
@@ -156,7 +156,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect(preg_match($regex, '/different/path'))->toBe(0);
             });
 
-            test('escapes special regex characters in exact patterns', function () {
+            test('escapes special regex characters in exact patterns', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/test.path/file.txt');
                 expect($regex)->toBe('/^\/test\.path\/file\.txt$/');
 
@@ -164,7 +164,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect(preg_match($regex, '/testXpath/fileXtxt'))->toBe(0);
             });
 
-            test('handles root path pattern', function () {
+            test('handles root path pattern', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/');
                 expect($regex)->toBe('/^\/$/');
 
@@ -174,8 +174,8 @@ describe('ConvertsWildcardPatterns', function () {
             });
         });
 
-        describe('normalization and edge cases', function () {
-            test('normalizes trailing slashes before processing', function () {
+        describe('normalization and edge cases', function (): void {
+            test('normalizes trailing slashes before processing', function (): void {
                 $regexWithSlash = $this->testClass->testWildcardToRegex('/blog/*/');
                 $regexWithoutSlash = $this->testClass->testWildcardToRegex('/blog/*');
 
@@ -183,7 +183,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect($regexWithSlash)->toBe('/^\/blog(\/.*)?$/');
             });
 
-            test('handles empty string pattern', function () {
+            test('handles empty string pattern', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('');
                 expect($regex)->toBe('/^\/$/');
 
@@ -191,7 +191,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect(preg_match($regex, ''))->toBe(0);
             });
 
-            test('handles complex regex characters', function () {
+            test('handles complex regex characters', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/test[0-9]+path/*');
                 expect($regex)->toBe('/^\/test\[0\-9\]\+path(\/.*)?$/');
 
@@ -200,7 +200,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect(preg_match($regex, '/test123path'))->toBe(0);
             });
 
-            test('handles patterns with query parameters and fragments', function () {
+            test('handles patterns with query parameters and fragments', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/search?q=*');
                 expect($regex)->toBe('/^\/search\?q\=.*$/');
 
@@ -210,8 +210,8 @@ describe('ConvertsWildcardPatterns', function () {
             });
         });
 
-        describe('real-world use cases', function () {
-            test('handles common blog patterns', function () {
+        describe('real-world use cases', function (): void {
+            test('handles common blog patterns', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/blog/*/');
 
                 expect(preg_match($regex, '/blog/my-first-post'))->toBe(1);
@@ -219,7 +219,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect(preg_match($regex, '/blog/category/tech'))->toBe(1);
             });
 
-            test('handles API versioning patterns', function () {
+            test('handles API versioning patterns', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/api/v*/users');
 
                 expect(preg_match($regex, '/api/v1/users'))->toBe(1);
@@ -228,7 +228,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect(preg_match($regex, '/api/users'))->toBe(0);
             });
 
-            test('handles file extension patterns', function () {
+            test('handles file extension patterns', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/uploads/*.jpg');
 
                 expect(preg_match($regex, '/uploads/photo.jpg'))->toBe(1);
@@ -236,7 +236,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect(preg_match($regex, '/uploads/photo.png'))->toBe(0);
             });
 
-            test('handles date-based URL patterns', function () {
+            test('handles date-based URL patterns', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/archive/*/posts');
 
                 expect(preg_match($regex, '/archive/2023/posts'))->toBe(1);
@@ -244,7 +244,7 @@ describe('ConvertsWildcardPatterns', function () {
                 expect(preg_match($regex, '/archive/january-2023/posts'))->toBe(1);
             });
 
-            test('handles user profile patterns', function () {
+            test('handles user profile patterns', function (): void {
                 $regex = $this->testClass->testWildcardToRegex('/users/*/profile');
 
                 expect(preg_match($regex, '/users/john-doe/profile'))->toBe(1);

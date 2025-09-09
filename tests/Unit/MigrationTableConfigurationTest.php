@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Schema;
 
-describe('Migration Table Configuration', function () {
-    test('migration creates table with default name when not configured', function () {
+describe('Migration Table Configuration', function (): void {
+    test('migration creates table with default name when not configured', function (): void {
         // Clear the redirects config to test default behavior
         config(['redirects' => []]);
 
@@ -34,7 +34,7 @@ describe('Migration Table Configuration', function () {
         expect(Schema::hasTable('redirects'))->toBeFalse();
     });
 
-    test('migration creates table with configured custom name', function () {
+    test('migration creates table with configured custom name', function (): void {
         $customTableName = 'my_awesome_redirects';
         config(['redirects.table' => $customTableName]);
 
@@ -67,7 +67,7 @@ describe('Migration Table Configuration', function () {
         expect(Schema::hasTable($customTableName))->toBeFalse();
     });
 
-    test('migration down method drops the correct configured table', function () {
+    test('migration down method drops the correct configured table', function (): void {
         $customTableName = 'custom_redirects_for_dropping';
         config(['redirects.table' => $customTableName]);
 
@@ -89,7 +89,7 @@ describe('Migration Table Configuration', function () {
         config(['redirects.table' => $differentTableName]);
 
         // Create the different table manually
-        Schema::create($differentTableName, function ($table) {
+        Schema::create($differentTableName, function ($table): void {
             $table->id();
             $table->string('test');
         });
@@ -107,7 +107,7 @@ describe('Migration Table Configuration', function () {
         Schema::dropIfExists($customTableName);
     });
 
-    test('multiple migrations with different table configurations work correctly', function () {
+    test('multiple migrations with different table configurations work correctly', function (): void {
         $table1 = 'redirects_migration_test_1';
         $table2 = 'redirects_migration_test_2';
 

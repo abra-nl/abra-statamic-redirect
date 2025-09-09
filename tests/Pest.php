@@ -11,7 +11,7 @@
 | need to change it using the "pest()" function to bind a different classes or traits.
 |
 */
-
+use Illuminate\Contracts\Console\Kernel;
 use Abra\AbraStatamicRedirect\Tests\TestCase;
 
 pest()->extend(TestCase::class)
@@ -29,9 +29,7 @@ pest()->extend(TestCase::class)
 |
 */
 
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
+expect()->extend('toBeOne', fn() => $this->toBe(1));
 
 /*
 |--------------------------------------------------------------------------
@@ -48,7 +46,7 @@ function createApplication()
 {
     $app = require __DIR__.'/../vendor/orchestra/testbench/laravel/bootstrap/app.php';
 
-    $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+    $app->make(Kernel::class)->bootstrap();
 
     return $app;
 }

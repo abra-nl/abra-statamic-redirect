@@ -42,9 +42,7 @@ class DatabaseRedirectRepository implements RedirectRepository
         $redirects = DB::table($this->table)
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(function ($item) {
-                return (array) $item;
-            })
+            ->map(fn($item): array => (array) $item)
             ->toArray();
 
         if ($this->cache_enabled) {
@@ -128,7 +126,7 @@ class DatabaseRedirectRepository implements RedirectRepository
             ->first();
 
         if (! $redirect) {
-            throw new Exception("Redirect with ID {$id} not found");
+            throw new Exception(sprintf('Redirect with ID %s not found', $id));
         }
 
         $updateData = [

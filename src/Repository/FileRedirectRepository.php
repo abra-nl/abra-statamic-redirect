@@ -136,7 +136,7 @@ class FileRedirectRepository implements RedirectRepository
             }
         }
 
-        throw new Exception("Redirect with ID {$id} not found");
+        throw new Exception(sprintf('Redirect with ID %s not found', $id));
     }
 
     public function delete(string $id): bool
@@ -175,7 +175,7 @@ class FileRedirectRepository implements RedirectRepository
     {
         try {
             return YAML::parse(File::get($this->path)) ?: [];
-        } catch (Exception $e) {
+        } catch (Exception) {
             return [];
         }
     }

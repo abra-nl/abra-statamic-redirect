@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Mock the RedirectRepository
     $this->redirectRepository = Mockery::mock(RedirectRepository::class);
 
@@ -19,8 +19,8 @@ beforeEach(function () {
     ];
 });
 
-describe('RedirectMiddleware', function () {
-    test('middleware passes through requests when no redirect exists', function () {
+describe('RedirectMiddleware', function (): void {
+    test('middleware passes through requests when no redirect exists', function (): void {
         config(['redirects.cache.enabled' => false]);
 
         $this->redirectRepository
@@ -32,15 +32,13 @@ describe('RedirectMiddleware', function () {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/test-path');
 
-        $response = $middleware->handle($request, function ($req) {
-            return new Response('Original content');
-        });
+        $response = $middleware->handle($request, fn($req): Response => new Response('Original content'));
 
         expect($response->getContent())->toBe('Original content');
         expect($response->getStatusCode())->toBe(200);
     });
 
-    test('middleware redirects when matching redirect is found', function () {
+    test('middleware redirects when matching redirect is found', function (): void {
         config(['redirects.cache.enabled' => false]);
 
         $this->redirectRepository
@@ -56,15 +54,13 @@ describe('RedirectMiddleware', function () {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/old-page');
 
-        $response = $middleware->handle($request, function ($req) {
-            return new Response('Should not reach here');
-        });
+        $response = $middleware->handle($request, fn($req): Response => new Response('Should not reach here'));
 
         expect($response->getStatusCode())->toBe(301);
         expect($response->getTargetUrl())->toBe('http://localhost/new-page');
     });
 
-    test('middleware skips CP routes', function () {
+    test('middleware skips CP routes', function (): void {
         config(['statamic.cp.route' => 'cp']);
 
         // Repository should not be called for CP routes
@@ -73,15 +69,13 @@ describe('RedirectMiddleware', function () {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/cp/redirects');
 
-        $response = $middleware->handle($request, function ($req) {
-            return new Response('CP Content');
-        });
+        $response = $middleware->handle($request, fn($req): Response => new Response('CP Content'));
 
         expect($response->getContent())->toBe('CP Content');
         expect($response->getStatusCode())->toBe(200);
     });
 
-    test('middleware respects custom CP route configuration', function () {
+    test('middleware respects custom CP route configuration', function (): void {
         config(['statamic.cp.route' => 'admin']);
 
         // Repository should not be called for custom CP routes
@@ -90,15 +84,13 @@ describe('RedirectMiddleware', function () {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/admin/dashboard');
 
-        $response = $middleware->handle($request, function ($req) {
-            return new Response('Admin Content');
-        });
+        $response = $middleware->handle($request, fn($req): Response => new Response('Admin Content'));
 
         expect($response->getContent())->toBe('Admin Content');
         expect($response->getStatusCode())->toBe(200);
     });
 
-    test('middleware preserves query parameters in redirects', function () {
+    test('middleware preserves query parameters in redirects', function (): void {
         config(['redirects.cache.enabled' => false]);
 
         $this->redirectRepository
@@ -114,9 +106,7 @@ describe('RedirectMiddleware', function () {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/old-page?utm_source=test&page=1');
 
-        $response = $middleware->handle($request, function ($req) {
-            return new Response('Should not reach here');
-        });
+        $response = $middleware->handle($request, fn($req): Response => new Response('Should not reach here'));
 
         expect($response->getStatusCode())->toBe(302);
         $targetUrl = $response->getTargetUrl();
@@ -125,7 +115,7 @@ describe('RedirectMiddleware', function () {
         expect($targetUrl)->toContain('page=1');
     });
 
-    test('middleware appends query parameters when destination already has query string', function () {
+    test('middleware appends query parameters when destination already has query string', function (): void {
         config(['redirects.cache.enabled' => false]);
 
         $this->redirectRepository
@@ -141,15 +131,13 @@ describe('RedirectMiddleware', function () {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/old-page?new=param');
 
-        $response = $middleware->handle($request, function ($req) {
-            return new Response('Should not reach here');
-        });
+        $response = $middleware->handle($request, fn($req): Response => new Response('Should not reach here'));
 
         expect($response->getStatusCode())->toBe(301);
         expect($response->getTargetUrl())->toBe('http://localhost/new-page?existing=param&new=param');
     });
 
-    test('middleware normalizes root path correctly', function () {
+    test('middleware normalizes root path correctly', function (): void {
         config(['redirects.cache.enabled' => false]);
 
         $this->redirectRepository
@@ -165,15 +153,13 @@ describe('RedirectMiddleware', function () {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/');
 
-        $response = $middleware->handle($request, function ($req) {
-            return new Response('Should not reach here');
-        });
+        $response = $middleware->handle($request, fn($req): Response => new Response('Should not reach here'));
 
         expect($response->getStatusCode())->toBe(301);
         expect($response->getTargetUrl())->toBe('http://localhost/home');
     });
 
-    test('middleware normalizes paths by adding leading slash', function () {
+    test('middleware normalizes paths by adding leading slash', function (): void {
         config(['redirects.cache.enabled' => false]);
 
         $this->redirectRepository
@@ -185,14 +171,12 @@ describe('RedirectMiddleware', function () {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('test-path'); // No leading slash
 
-        $response = $middleware->handle($request, function ($req) {
-            return new Response('Original content');
-        });
+        $response = $middleware->handle($request, fn($req): Response => new Response('Original content'));
 
         expect($response->getContent())->toBe('Original content');
     });
 
-    test('middleware caches redirect lookups when cache is enabled', function () {
+    test('middleware caches redirect lookups when cache is enabled', function (): void {
         config([
             'redirects.cache.enabled' => true,
             'redirects.cache.expiry' => 60,
@@ -217,9 +201,7 @@ describe('RedirectMiddleware', function () {
         $request = Request::create('/cached-page');
 
         // First request - should call repository and cache result
-        $response = $middleware->handle($request, function ($req) {
-            return new Response('Should not reach here');
-        });
+        $response = $middleware->handle($request, fn($req): Response => new Response('Should not reach here'));
 
         expect($response->getStatusCode())->toBe(301);
 
@@ -229,7 +211,7 @@ describe('RedirectMiddleware', function () {
         expect(Cache::get($cacheKey))->toBe($redirect);
     });
 
-    test('middleware uses cached redirects when available', function () {
+    test('middleware uses cached redirects when available', function (): void {
         config([
             'redirects.cache.enabled' => true,
             'redirects.cache.expiry' => 60,
@@ -251,15 +233,13 @@ describe('RedirectMiddleware', function () {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/cached-page');
 
-        $response = $middleware->handle($request, function ($req) {
-            return new Response('Should not reach here');
-        });
+        $response = $middleware->handle($request, fn($req): Response => new Response('Should not reach here'));
 
         expect($response->getStatusCode())->toBe(302);
         expect($response->getTargetUrl())->toBe('http://localhost/cached-destination');
     });
 
-    test('middleware does not cache null results', function () {
+    test('middleware does not cache null results', function (): void {
         config([
             'redirects.cache.enabled' => true,
             'redirects.cache.expiry' => 60,
@@ -277,9 +257,7 @@ describe('RedirectMiddleware', function () {
         $middleware = new RedirectMiddleware($this->redirectRepository);
         $request = Request::create('/non-existent');
 
-        $response = $middleware->handle($request, function ($req) {
-            return new Response('Original content');
-        });
+        $response = $middleware->handle($request, fn($req): Response => new Response('Original content'));
 
         expect($response->getContent())->toBe('Original content');
 
@@ -288,7 +266,7 @@ describe('RedirectMiddleware', function () {
         expect(Cache::has($cacheKey))->toBeFalse();
     });
 
-    test('middleware handles different status codes correctly', function () {
+    test('middleware handles different status codes correctly', function (): void {
         config(['redirects.cache.enabled' => false]);
 
         $statusCodes = [301, 302, 307, 308];
@@ -296,27 +274,25 @@ describe('RedirectMiddleware', function () {
         foreach ($statusCodes as $statusCode) {
             $this->redirectRepository
                 ->shouldReceive('find')
-                ->with("/test-{$statusCode}")
+                ->with('/test-' . $statusCode)
                 ->once()
                 ->andReturn([
-                    'source' => "/test-{$statusCode}",
-                    'destination' => "/new-{$statusCode}",
+                    'source' => '/test-' . $statusCode,
+                    'destination' => '/new-' . $statusCode,
                     'status_code' => $statusCode,
                 ]);
 
             $middleware = new RedirectMiddleware($this->redirectRepository);
-            $request = Request::create("/test-{$statusCode}");
+            $request = Request::create('/test-' . $statusCode);
 
-            $response = $middleware->handle($request, function ($req) {
-                return new Response('Should not reach here');
-            });
+            $response = $middleware->handle($request, fn($req): Response => new Response('Should not reach here'));
 
             expect($response->getStatusCode())->toBe($statusCode);
-            expect($response->getTargetUrl())->toBe("http://localhost/new-{$statusCode}");
+            expect($response->getTargetUrl())->toBe('http://localhost/new-' . $statusCode);
         }
     });
 
-    test('middleware constructor reads cache configuration correctly', function () {
+    test('middleware constructor reads cache configuration correctly', function (): void {
         config([
             'redirects.cache.enabled' => true,
             'redirects.cache.expiry' => 120,
@@ -329,14 +305,16 @@ describe('RedirectMiddleware', function () {
 
         $cacheEnabledProperty = $reflection->getProperty('cache_enabled');
         $cacheEnabledProperty->setAccessible(true);
+
         expect($cacheEnabledProperty->getValue($middleware))->toBeTrue();
 
         $cacheExpiryProperty = $reflection->getProperty('cache_expiry');
         $cacheExpiryProperty->setAccessible(true);
+
         expect($cacheExpiryProperty->getValue($middleware))->toBe(120);
     });
 
-    test('middleware uses default cache configuration when not set', function () {
+    test('middleware uses default cache configuration when not set', function (): void {
         // Remove cache config to test defaults
         config(['redirects' => []]);
 
@@ -347,10 +325,12 @@ describe('RedirectMiddleware', function () {
 
         $cacheEnabledProperty = $reflection->getProperty('cache_enabled');
         $cacheEnabledProperty->setAccessible(true);
+
         expect($cacheEnabledProperty->getValue($middleware))->toBeFalse(); // Default false
 
         $cacheExpiryProperty = $reflection->getProperty('cache_expiry');
         $cacheExpiryProperty->setAccessible(true);
+
         expect($cacheExpiryProperty->getValue($middleware))->toBe(60); // Default 60
     });
 });

@@ -8,7 +8,7 @@ use Abra\AbraStatamicRedirect\ServiceProvider;
 use Illuminate\Support\Facades\File;
 use Statamic\Facades\CP\Nav;
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Mock Nav facade to prevent navigation extension errors
     Nav::shouldReceive('extend')->byDefault();
 
@@ -19,9 +19,9 @@ beforeEach(function () {
     $this->serviceProvider->register();
 });
 
-describe('ServiceProvider', function () {
-    describe('repository binding', function () {
-        test('binds FileRedirectRepository when storage is file', function () {
+describe('ServiceProvider', function (): void {
+    describe('repository binding', function (): void {
+        test('binds FileRedirectRepository when storage is file', function (): void {
             config(['redirects.storage' => 'file']);
 
             $this->serviceProvider->bootAddon();
@@ -31,7 +31,7 @@ describe('ServiceProvider', function () {
             expect($repository)->toBeInstanceOf(FileRedirectRepository::class);
         });
 
-        test('binds DatabaseRedirectRepository when storage is database', function () {
+        test('binds DatabaseRedirectRepository when storage is database', function (): void {
             config(['redirects.storage' => 'database']);
 
             $this->serviceProvider->bootAddon();
@@ -41,7 +41,7 @@ describe('ServiceProvider', function () {
             expect($repository)->toBeInstanceOf(DatabaseRedirectRepository::class);
         });
 
-        test('defaults to FileRedirectRepository when storage config is null', function () {
+        test('defaults to FileRedirectRepository when storage config is null', function (): void {
             config(['redirects.storage' => null]);
 
             $this->serviceProvider->bootAddon();
@@ -51,7 +51,7 @@ describe('ServiceProvider', function () {
             expect($repository)->toBeInstanceOf(FileRedirectRepository::class);
         });
 
-        test('defaults to FileRedirectRepository for invalid storage type', function () {
+        test('defaults to FileRedirectRepository for invalid storage type', function (): void {
             config(['redirects.storage' => 'invalid_storage_type']);
 
             $this->serviceProvider->bootAddon();
@@ -61,7 +61,7 @@ describe('ServiceProvider', function () {
             expect($repository)->toBeInstanceOf(FileRedirectRepository::class);
         });
 
-        test('resolves different instances each time when not singleton', function () {
+        test('resolves different instances each time when not singleton', function (): void {
             config(['redirects.storage' => 'file']);
 
             $this->serviceProvider->bootAddon();
@@ -73,8 +73,8 @@ describe('ServiceProvider', function () {
         });
     });
 
-    describe('configuration', function () {
-        test('registers configuration correctly', function () {
+    describe('configuration', function (): void {
+        test('registers configuration correctly', function (): void {
             $this->serviceProvider->register();
 
             // Test default configuration values are merged
@@ -85,7 +85,7 @@ describe('ServiceProvider', function () {
                 ->and(config('redirects.cache.expiry_time'))->toBe(60);
         });
 
-        test('custom config values override defaults', function () {
+        test('custom config values override defaults', function (): void {
             // Set custom config before registering
             config([
                 'redirects.storage' => 'custom',
@@ -99,7 +99,7 @@ describe('ServiceProvider', function () {
                 ->and(config('redirects.cache.enabled'))->toBeFalse();
         });
 
-        test('publishes config file with correct tag', function () {
+        test('publishes config file with correct tag', function (): void {
             $this->serviceProvider->bootAddon();
 
             // Verify config publishing is set up correctly
@@ -120,8 +120,8 @@ describe('ServiceProvider', function () {
         });
     });
 
-    describe('middleware registration', function () {
-        test('registers RedirectMiddleware in statamic.web group', function () {
+    describe('middleware registration', function (): void {
+        test('registers RedirectMiddleware in statamic.web group', function (): void {
             // Access the middleware groups property
             $reflection = new ReflectionClass($this->serviceProvider);
             $middlewareProperty = $reflection->getProperty('middlewareGroups');
@@ -132,8 +132,8 @@ describe('ServiceProvider', function () {
         });
     });
 
-    describe('navigation extension', function () {
-        test('extends Statamic CP navigation with Redirects item', function () {
+    describe('navigation extension', function (): void {
+        test('extends Statamic CP navigation with Redirects item', function (): void {
             // Mock Nav facade to capture extension calls
             Nav::shouldReceive('extend')
                 ->once()
@@ -142,14 +142,14 @@ describe('ServiceProvider', function () {
             $this->serviceProvider->bootAddon();
         });
 
-        test('navigation item has correct properties', function () {
+        test('navigation item has correct properties', function (): void {
             // Capture the navigation extension closure
             $capturedClosure = null;
 
             Nav::shouldReceive('extend')
                 ->once()
                 ->with(Closure::class)
-                ->andReturnUsing(function ($closure) use (&$capturedClosure) {
+                ->andReturnUsing(function ($closure) use (&$capturedClosure): void {
                     $capturedClosure = $closure;
                 });
 
@@ -184,8 +184,8 @@ describe('ServiceProvider', function () {
         });
     });
 
-    describe('view loading', function () {
-        test('loads views from correct namespace and path', function () {
+    describe('view loading', function (): void {
+        test('loads views from correct namespace and path', function (): void {
             $this->serviceProvider->bootAddon();
 
             // Verify views are loaded with correct namespace
@@ -205,7 +205,7 @@ describe('ServiceProvider', function () {
             expect($viewPathFound)->toBeTrue();
         });
 
-        test('view files exist in the specified directory', function () {
+        test('view files exist in the specified directory', function (): void {
             $viewsPath = __DIR__.'/../../resources/views';
 
             expect(File::exists($viewsPath.'/index.blade.php'))->toBeTrue()
@@ -215,8 +215,8 @@ describe('ServiceProvider', function () {
         });
     });
 
-    describe('migration publishing', function () {
-        test('publishes migrations to correct directory', function () {
+    describe('migration publishing', function (): void {
+        test('publishes migrations to correct directory', function (): void {
             $this->serviceProvider->bootAddon();
 
             // Verify migration publishing is set up correctly
@@ -234,7 +234,7 @@ describe('ServiceProvider', function () {
             expect($foundMigrationPublish)->toBeTrue();
         });
 
-        test('migration files exist in source directory', function () {
+        test('migration files exist in source directory', function (): void {
             $migrationsPath = __DIR__.'/../../database/migrations';
 
             expect(File::isDirectory($migrationsPath))->toBeTrue();
@@ -245,8 +245,8 @@ describe('ServiceProvider', function () {
         });
     });
 
-    describe('integration tests', function () {
-        test('all services are properly registered and bootable', function () {
+    describe('integration tests', function (): void {
+        test('all services are properly registered and bootable', function (): void {
             // Boot the service provider (register was already called in beforeEach)
             $this->serviceProvider->bootAddon();
 
@@ -262,7 +262,7 @@ describe('ServiceProvider', function () {
             expect($hints)->toHaveKey('abra-redirects');
         });
 
-        test('switching storage types works correctly', function () {
+        test('switching storage types works correctly', function (): void {
             // Test file storage
             config(['redirects.storage' => 'file']);
             $this->serviceProvider->bootAddon();

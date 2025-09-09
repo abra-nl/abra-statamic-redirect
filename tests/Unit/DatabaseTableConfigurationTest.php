@@ -5,8 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-describe('Database Table Configuration', function () {
-    test('database repository uses default table name when not configured', function () {
+describe('Database Table Configuration', function (): void {
+    test('database repository uses default table name when not configured', function (): void {
         // Create a temporary config instance without the redirects.table key
         $originalConfig = config('redirects.table');
         config(['redirects' => []]);
@@ -26,7 +26,7 @@ describe('Database Table Configuration', function () {
         }
     });
 
-    test('database repository uses configured table name', function () {
+    test('database repository uses configured table name', function (): void {
         config(['redirects.table' => 'custom_redirects_table']);
 
         $repository = new DatabaseRedirectRepository;
@@ -39,12 +39,12 @@ describe('Database Table Configuration', function () {
         expect($tableProperty->getValue($repository))->toBe('custom_redirects_table');
     });
 
-    test('database repository operations use configured table name', function () {
+    test('database repository operations use configured table name', function (): void {
         $customTableName = 'my_custom_redirects';
         config(['redirects.table' => $customTableName]);
 
         // Create the custom table for testing
-        Schema::create($customTableName, function (Blueprint $table) {
+        Schema::create($customTableName, function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->string('source')->unique()->index();
             $table->string('destination');
@@ -98,12 +98,12 @@ describe('Database Table Configuration', function () {
         Schema::dropIfExists($customTableName);
     });
 
-    test('multiple repository instances with different table configurations work independently', function () {
+    test('multiple repository instances with different table configurations work independently', function (): void {
         $table1 = 'redirects_table_1';
         $table2 = 'redirects_table_2';
 
         // Create both tables
-        Schema::create($table1, function (Blueprint $table) {
+        Schema::create($table1, function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->string('source')->unique()->index();
             $table->string('destination');
@@ -111,7 +111,7 @@ describe('Database Table Configuration', function () {
             $table->timestamps();
         });
 
-        Schema::create($table2, function (Blueprint $table) {
+        Schema::create($table2, function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->string('source')->unique()->index();
             $table->string('destination');
@@ -164,12 +164,12 @@ describe('Database Table Configuration', function () {
         Schema::dropIfExists($table2);
     });
 
-    test('repository handles table name configuration changes correctly', function () {
+    test('repository handles table name configuration changes correctly', function (): void {
         $originalTable = 'original_redirects';
         $newTable = 'new_redirects';
 
         // Create original table
-        Schema::create($originalTable, function (Blueprint $table) {
+        Schema::create($originalTable, function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->string('source')->unique()->index();
             $table->string('destination');
@@ -190,7 +190,7 @@ describe('Database Table Configuration', function () {
         expect($repository->all())->toHaveCount(1);
 
         // Create new table and reconfigure
-        Schema::create($newTable, function (Blueprint $table) {
+        Schema::create($newTable, function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->string('source')->unique()->index();
             $table->string('destination');
