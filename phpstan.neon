@@ -1,0 +1,39 @@
+parameters:
+    # The level of analysis (0-10, 10 being the strictest)
+    level: 6
+    
+    # Paths to analyse
+    paths:
+        - src
+    
+    # Paths to exclude from analysis
+    excludePaths:
+        - vendor/*
+        - node_modules/*
+        - coverage-html/*
+        - tests/*
+    
+    # Ignore specific errors that are common in packages
+    ignoreErrors:
+        # Ignore missing classes from Statamic/Laravel that may not be available during static analysis
+        - '#Call to an undefined method Statamic\\#'
+        - '#Class Statamic\\.* not found#'
+        - '#Class Illuminate\\.* not found#'
+        - '#Access to an undefined property Illuminate\\#'
+        - '#Call to an undefined method Illuminate\\#'
+        - '#Parameter .* of method .* has invalid type Illuminate\\#'
+        - '#Return type .* of method .* has invalid type Illuminate\\#'
+        - '#Property .* has invalid type Illuminate\\#'
+        # Ignore Laravel facade issues
+        - '#Call to an undefined static method Illuminate\\Support\\Facades\\#'
+        - '#Access to an undefined property Illuminate\\Support\\Facades\\#'
+    
+    # Memory limit for analysis
+    memoryLimitFile: 512M
+    
+    # Enable bleeding edge features
+    reportUnmatchedIgnoredErrors: false
+    
+    # Bootstrap file for package testing
+    bootstrapFiles:
+        - vendor/autoload.php

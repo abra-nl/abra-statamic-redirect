@@ -21,7 +21,11 @@
     },
     "require-dev": {
         "orchestra/testbench": "^10.6",
-        "pestphp/pest": "^4.0"
+        "pestphp/pest": "^4.0",
+        "mockery/mockery": "^1.6",
+        "laravel/pint": "^1.0",
+        "phpstan/phpstan": "^1.0",
+        "rector/rector": "^1.0"
     },
     "require": {
         "php": "^8.1",
@@ -43,5 +47,28 @@
           "Abra\\AbraStatamicRedirect\\ServiceProvider"
         ]
       }
+    },
+    "scripts": {
+        "test": "pest",
+        "test:unit": "pest tests/Unit",
+        "test:feature": "pest tests/Feature",
+        "test:coverage": "pest --coverage --min=80 --coverage-html=build/coverage --coverage-clover=build/coverage/clover.xml",
+        "pint": "./vendor/bin/pint",
+        "pint:check": "./vendor/bin/pint --test",
+        "pint:dirty": "./vendor/bin/pint --dirty",
+        "stan": "./vendor/bin/phpstan analyse",
+        "stan:baseline": "./vendor/bin/phpstan analyse --generate-baseline",
+        "rector": "./vendor/bin/rector process",
+        "rector:dry": "./vendor/bin/rector process --dry-run",
+        "code:check": [
+            "@pint:check",
+            "@stan",
+            "@test"
+        ],
+        "code:fix": [
+            "@pint",
+            "@rector",
+            "@test"
+        ]
     }
 }

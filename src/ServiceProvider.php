@@ -29,7 +29,7 @@ class ServiceProvider extends AddonServiceProvider
 
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'abra-redirects');
 
-        $this->app->bind(RedirectRepository::class, function () {
+        $this->app->bind(RedirectRepository::class, function (): DatabaseRedirectRepository|FileRedirectRepository {
             $storage = config('redirects.storage', 'file');
 
             if ($storage === 'database') {
@@ -39,10 +39,10 @@ class ServiceProvider extends AddonServiceProvider
             return new FileRedirectRepository;
         });
 
-        Nav::extend(function ($nav) {
+        Nav::extend(function ($nav): void {
             $nav->create('Redirects')
                 ->section('Settings')
-                ->route('abra-statamic-redirects.index')
+                ->route('statamic.cp.abra-statamic-redirects.index')
                 ->icon('list');
         });
     }

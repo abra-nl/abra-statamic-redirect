@@ -4,29 +4,26 @@ namespace Abra\AbraStatamicRedirect\Http\Middleware;
 
 use Abra\AbraStatamicRedirect\Interfaces\RedirectRepository;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 class RedirectMiddleware
 {
-    protected RedirectRepository $redirects;
-
     protected bool $cache_enabled;
 
     protected int $cache_expiry;
 
-    public function __construct(RedirectRepository $redirects)
+    public function __construct(protected RedirectRepository $redirects)
     {
         /** @var bool $cacheEnabled */
         $cacheEnabled = config('redirects.cache.enabled', false);
         /** @var int $cacheExpiry */
         $cacheExpiry = config('redirects.cache.expiry', 60);
-
-        $this->redirects = $redirects;
         $this->cache_enabled = $cacheEnabled;
         $this->cache_expiry = $cacheExpiry;
     }
 
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         /** @var string $cpRoute */
         $cpRoute = config('statamic.cp.route', 'cp');
@@ -55,8 +52,7 @@ class RedirectMiddleware
     /**
      * Find a redirect for the given path
      *
-     * @param  string  $path
-     * @return array|null
+     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}|null
      */
     protected function findRedirectForPath(string $path): ?array
     {
@@ -81,7 +77,7 @@ class RedirectMiddleware
     protected function normalizePath(string $path): string
     {
         // If root path, return /
-        if (empty($path)) {
+        if ($path === '' || $path === '0') {
             return '/';
         }
 

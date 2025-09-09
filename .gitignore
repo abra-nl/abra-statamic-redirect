@@ -2,4 +2,21 @@ node_modules
 vendor
 composer.lock
 .phpunit.result.cache
+.phpunit.cache/
 .idea
+tests/__fixtures__
+
+# Code coverage reports
+coverage-html/
+coverage.xml
+coverage.txt
+.coverage/
+
+# Test results
+tests/results.xml
+
+# Static analysis and code quality tools
+phpstan-baseline.neon
+.phpstan-cache/
+.rector/
+.pint.cache

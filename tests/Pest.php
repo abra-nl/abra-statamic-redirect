@@ -11,7 +11,6 @@
 | need to change it using the "pest()" function to bind a different classes or traits.
 |
 */
-
 use Abra\AbraStatamicRedirect\Tests\TestCase;
 
 pest()->extend(TestCase::class)
@@ -29,9 +28,7 @@ pest()->extend(TestCase::class)
 |
 */
 
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
+expect()->extend('toBeOne', fn () => $this->toBe(1));
 
 /*
 |--------------------------------------------------------------------------
@@ -43,8 +40,3 @@ expect()->extend('toBeOne', function () {
 | global functions to help you to reduce the number of lines of code in your test files.
 |
 */
-
-function something()
-{
-    // ..
-}

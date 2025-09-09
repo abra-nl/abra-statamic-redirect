@@ -1,5 +1,6 @@
 <?php
 
+use Abra\AbraStatamicRedirect\Http\Controllers\RedirectController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('redirects')->name('abra-statamic-redirects.')->group(function () {
