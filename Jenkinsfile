@@ -171,9 +171,14 @@ pipeline {
                     ])
                     
                     // Publish Clover coverage for trend analysis
-                    publishCoverage adapters: [
-                        coberturaAdapter('build/coverage/clover.xml')
-                    ], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
+                    recordCoverage(
+                        tools: [[parser: 'CLOVER', pattern: 'build/coverage/clover.xml']],
+                        sourceCodeRetention: 'EVERY_BUILD',
+                        qualityGates: [
+                            [threshold: 80.0, metric: 'LINE', baseline: 'PROJECT', unhealthy: true],
+                            [threshold: 80.0, metric: 'BRANCH', baseline: 'PROJECT', unhealthy: true]
+                        ]
+                    )
                     
                     // Archive coverage artifacts
                     archiveArtifacts artifacts: 'build/coverage/**/*', fingerprint: false, allowEmptyArchive: false
