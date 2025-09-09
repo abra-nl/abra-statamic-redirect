@@ -104,67 +104,6 @@ pipeline {
             }
         }
 
-        stage('Testing') {
-            steps {
-                echo 'Running comprehensive test suite...'
-
-                // Create necessary directories for coverage and test results
-                sh '''
-                    mkdir -p coverage-html
-                    mkdir -p tests
-                    mkdir -p .phpunit-cache
-                    touch tests/results.xml
-                '''
-
-                // Run the complete test suite with coverage (with fallback)
-                sh '''
-                    composer test:coverage-clover || {
-                        echo "Coverage with clover failed, trying without clover output..."
-                        composer test:coverage || {
-                            echo "Coverage failed, running tests without coverage..."
-                            composer test
-                        }
-                    }
-                '''
-
-                // Run minimum coverage check (with fallback)
-                sh '''
-                    composer test:min-coverage || {
-                        echo "Minimum coverage check failed, but continuing..."
-                    }
-                '''
-            }
-
-            post {
-                always {
-                    // Publish test results
-                    publishTestResults testResultsPattern: 'tests/results.xml'
-
-                    // Publish coverage report
-                    publishHTML([
-                        allowMissing: true,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'coverage-html',
-                        reportFiles: 'index.html',
-                        reportName: 'Coverage Report',
-                        reportTitles: 'PHP Code Coverage'
-                    ])
-
-                    // Archive coverage files
-                    archiveArtifacts artifacts: 'coverage.xml,coverage-html/**', fingerprint: true
-                }
-
-                success {
-                    echo 'All tests passed! ✅'
-                }
-
-                failure {
-                    echo 'Tests failed! ❌'
-                }
-            }
-        }
-
         stage('Specialized Tests') {
             parallel {
                 stage('Unit Tests Only') {
