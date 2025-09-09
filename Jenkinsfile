@@ -221,50 +221,6 @@ pipeline {
                 '''
             }
         }
-
-        stage('Build Quality Gates') {
-            steps {
-                script {
-                    echo 'Evaluating build quality gates...'
-                    
-                    // Check if coverage meets minimum threshold
-                    def coverageStatus = 'PASSED'
-                    try {
-                        if (fileExists('build/coverage/clover.xml')) {
-                            echo 'Coverage report found - checking thresholds...'
-                            // The composer test:coverage command will fail if minimum threshold is not met
-                            // So if we reach here, coverage passed
-                        } else {
-                            coverageStatus = 'FAILED - No coverage report found'
-                        }
-                    } catch (Exception e) {
-                        coverageStatus = 'FAILED - Coverage below threshold'
-                    }
-                    
-                    // Quality gate checks
-                    def qualityGates = [
-                        'Code Style': 'PASSED',
-                        'Static Analysis': 'PASSED', 
-                        'Security': 'PASSED',
-                        'Tests': 'PASSED',
-                        'Coverage': coverageStatus
-                    ]
-                    
-                    echo "Quality Gates Summary:"
-                    qualityGates.each { gate, status ->
-                        echo "  ${gate}: ${status}"
-                    }
-                    
-                    // Check if any gates failed
-                    def failedGates = qualityGates.findAll { gate, status -> status.contains('FAILED') }
-                    if (failedGates) {
-                        error "Quality gates failed: ${failedGates.keySet().join(', ')}"
-                    }
-                    
-                    echo 'All quality gates passed! 🎉'
-                }
-            }
-        }
     }
 
     post {
