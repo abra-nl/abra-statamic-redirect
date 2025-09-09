@@ -116,9 +116,6 @@ pipeline {
                     touch tests/results.xml
                 '''
 
-                // Generate JUnit test results first
-                sh 'composer test:junit'
-
                 // Run the complete test suite with coverage (with fallback)
                 sh '''
                     composer test:coverage-clover || {

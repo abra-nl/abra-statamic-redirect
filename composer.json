@@ -52,7 +52,6 @@
         "test": "pest",
         "test:unit": "pest tests/Unit",
         "test:feature": "pest tests/Feature",
-        "test:junit": "pest --log-junit tests/results.xml --do-not-cache-result",
         "test:coverage": "php -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --do-not-cache-result",
         "test:coverage-html": "php -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --coverage-html=coverage-html --do-not-cache-result",
         "test:coverage-clover": "php -d \"xdebug.mode=coverage\" ./vendor/bin/pest --coverage --coverage-clover=coverage.xml --do-not-cache-result",
