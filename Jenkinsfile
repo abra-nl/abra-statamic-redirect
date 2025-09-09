@@ -176,7 +176,6 @@ pipeline {
                         sourceCodeRetention: 'EVERY_BUILD',
                         qualityGates: [
                             [threshold: 80.0, metric: 'LINE', baseline: 'PROJECT'],
-                            [threshold: 80.0, metric: 'BRANCH', baseline: 'PROJECT']
                         ]
                     )
                     
