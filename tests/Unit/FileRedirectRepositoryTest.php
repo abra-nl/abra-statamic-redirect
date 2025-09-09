@@ -489,14 +489,12 @@ describe('FileRedirectRepository', function (): void {
             expect($updatedAt->between($before, $after))->toBeTrue();
         });
 
-        test('returns empty array when ID not found', function (): void {
+        test('throws exception when ID not found', function (): void {
             $repository = new FileRedirectRepository;
 
-            $result = $repository->update('non-existent-id', [
+            expect(fn () => $repository->update('non-existent-id', [
                 'destination' => '/some-dest',
-            ]);
-
-            expect($result)->toBe([]);
+            ]))->toThrow(Exception::class, 'Redirect with ID non-existent-id not found');
 
             // Verify no changes to file
             $allRedirects = $repository->all();
