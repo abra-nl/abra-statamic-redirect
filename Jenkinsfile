@@ -102,47 +102,6 @@ pipeline {
             }
         }
 
-        stage('Testing') {
-            steps {
-                echo 'Running comprehensive test suite...'
-                
-                // Run the complete test suite with coverage
-                sh 'composer test:coverage-clover'
-                
-                // Run minimum coverage check
-                sh 'composer test:min-coverage'
-            }
-            
-            post {
-                always {
-                    // Publish test results
-                    publishTestResults testResultsPattern: 'tests/results.xml'
-                    
-                    // Publish coverage report
-                    publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'coverage-html',
-                        reportFiles: 'index.html',
-                        reportName: 'Coverage Report',
-                        reportTitles: 'PHP Code Coverage'
-                    ])
-                    
-                    // Archive coverage files
-                    archiveArtifacts artifacts: 'coverage.xml,coverage-html/**', fingerprint: true
-                }
-                
-                success {
-                    echo 'All tests passed! ✅'
-                }
-                
-                failure {
-                    echo 'Tests failed! ❌'
-                }
-            }
-        }
-
         stage('Specialized Tests') {
             parallel {
                 stage('Unit Tests Only') {
