@@ -249,9 +249,6 @@ pipeline {
         
         success {
             echo '✅ Build completed successfully!'
-            
-            // Notify on success if needed
-            // slackSend(color: 'good', message: "✅ ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} completed successfully!")
         }
         
         failure {
@@ -259,9 +256,6 @@ pipeline {
             
             // Archive logs for debugging
             archiveArtifacts artifacts: 'storage/logs/**/*.log', fingerprint: false, allowEmptyArchive: true
-            
-            // Notify on failure if needed
-            // slackSend(color: 'danger', message: "❌ ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} failed!")
         }
         
         unstable {
