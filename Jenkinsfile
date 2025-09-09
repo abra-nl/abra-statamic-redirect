@@ -104,7 +104,7 @@ pipeline {
             }
         }
 
-        stage('Specialized Tests') {
+        stage("Prepare cache directory") {
             steps {
                 echo 'Creating test cache directory...'
                 sh '''
@@ -112,6 +112,9 @@ pipeline {
                     chmod 755 .phpunit.cache
                 '''
             }
+        }
+
+        stage('Specialized Tests') {
             parallel {
                 stage('Unit Tests Only') {
                     steps {
