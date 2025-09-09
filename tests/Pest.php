@@ -12,7 +12,6 @@
 |
 */
 use Abra\AbraStatamicRedirect\Tests\TestCase;
-use Illuminate\Contracts\Console\Kernel;
 
 pest()->extend(TestCase::class)
  // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
@@ -41,12 +40,3 @@ expect()->extend('toBeOne', fn () => $this->toBe(1));
 | global functions to help you to reduce the number of lines of code in your test files.
 |
 */
-
-function createApplication()
-{
-    $app = require __DIR__.'/../vendor/orchestra/testbench/laravel/bootstrap/app.php';
-
-    $app->make(Kernel::class)->bootstrap();
-
-    return $app;
-}

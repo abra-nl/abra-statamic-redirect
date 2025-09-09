@@ -8,13 +8,13 @@ use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 class TestCase extends AddonTestCase
 {
+    use CreatesApplication;
     use PreventsSavingStacheItemsToDisk;
 
     protected string $addonServiceProvider = ServiceProvider::class;
 
     protected function resolveApplicationConfiguration($app): void
     {
-
         parent::resolveApplicationConfiguration($app);
 
         // Set a proper application key
