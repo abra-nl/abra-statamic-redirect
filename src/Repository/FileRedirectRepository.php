@@ -36,6 +36,9 @@ class FileRedirectRepository implements RedirectRepository
         }
     }
 
+    /**
+     * @return array<int, array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}>
+     */
     public function all(): array
     {
         if ($this->cache_enabled && Cache::has('redirects.all')) {
@@ -51,6 +54,9 @@ class FileRedirectRepository implements RedirectRepository
         return $redirects;
     }
 
+    /**
+     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}|null
+     */
     public function find(string $source): ?array
     {
         // Normalize the source URL for matching
@@ -82,6 +88,10 @@ class FileRedirectRepository implements RedirectRepository
         return null;
     }
 
+    /**
+     * @param  array{source: string, destination: string, status_code?: int}  $data
+     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}
+     */
     public function store(array $data): array
     {
         $redirects = $this->all();
@@ -103,6 +113,10 @@ class FileRedirectRepository implements RedirectRepository
         return $redirect;
     }
 
+    /**
+     * @param  array{source?: string, destination?: string, status_code?: int}  $data
+     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}
+     */
     public function update(string $id, array $data): array
     {
         $redirects = $this->all();
@@ -122,7 +136,7 @@ class FileRedirectRepository implements RedirectRepository
             }
         }
 
-        return [];
+        throw new Exception("Redirect with ID {$id} not found");
     }
 
     public function delete(string $id): bool
@@ -154,6 +168,9 @@ class FileRedirectRepository implements RedirectRepository
         return false;
     }
 
+    /**
+     * @return array<int, array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}>
+     */
     protected function getRedirects(): array
     {
         try {
@@ -165,6 +182,8 @@ class FileRedirectRepository implements RedirectRepository
 
     /**
      * Save redirects to YAML file
+     *
+     * @param  array<int, array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}>  $redirects
      */
     protected function saveRedirects(array $redirects): bool
     {

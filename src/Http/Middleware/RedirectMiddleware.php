@@ -4,6 +4,7 @@ namespace Abra\AbraStatamicRedirect\Http\Middleware;
 
 use Abra\AbraStatamicRedirect\Interfaces\RedirectRepository;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 class RedirectMiddleware
@@ -26,7 +27,7 @@ class RedirectMiddleware
         $this->cache_expiry = $cacheExpiry;
     }
 
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         /** @var string $cpRoute */
         $cpRoute = config('statamic.cp.route', 'cp');
@@ -54,6 +55,8 @@ class RedirectMiddleware
 
     /**
      * Find a redirect for the given path
+     *
+     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}|null
      */
     protected function findRedirectForPath(string $path): ?array
     {

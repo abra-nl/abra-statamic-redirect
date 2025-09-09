@@ -4,6 +4,7 @@ namespace Abra\AbraStatamicRedirect\Repository;
 
 use Abra\AbraStatamicRedirect\Concerns\ConvertsWildcardPatterns;
 use Abra\AbraStatamicRedirect\Interfaces\RedirectRepository;
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -26,10 +27,13 @@ class DatabaseRedirectRepository implements RedirectRepository
         $this->cache_expiry = Config::integer('redirects.cache_expiry', 60);
     }
 
+    /**
+     * @return array<int, array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}>
+     */
     public function all(): array
     {
         if ($this->cache_enabled && Cache::has('redirects.all')) {
-            /** @var string[] $redirects */
+            /** @var array<int, array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}> $redirects */
             $redirects = Cache::get('redirects.all');
 
             return $redirects;
@@ -50,6 +54,9 @@ class DatabaseRedirectRepository implements RedirectRepository
         return $redirects;
     }
 
+    /**
+     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}|null
+     */
     public function find(string $source): ?array
     {
         $normalizedSource = $this->normalizeUrl($source);
@@ -83,6 +90,10 @@ class DatabaseRedirectRepository implements RedirectRepository
         return null;
     }
 
+    /**
+     * @param  array{source: string, destination: string, status_code?: int}  $data
+     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}
+     */
     public function store(array $data): array
     {
         $now = now();
@@ -107,7 +118,8 @@ class DatabaseRedirectRepository implements RedirectRepository
     }
 
     /**
-     * {@inheritDoc}
+     * @param  array{source?: string, destination?: string, status_code?: int}  $data
+     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}
      */
     public function update(string $id, array $data): array
     {
@@ -116,7 +128,7 @@ class DatabaseRedirectRepository implements RedirectRepository
             ->first();
 
         if (! $redirect) {
-            return [];
+            throw new Exception("Redirect with ID {$id} not found");
         }
 
         $updateData = [
