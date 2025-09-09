@@ -8,7 +8,6 @@ use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 class TestCase extends AddonTestCase
 {
-    use CreatesApplication;
     use PreventsSavingStacheItemsToDisk;
 
     protected string $addonServiceProvider = ServiceProvider::class;
