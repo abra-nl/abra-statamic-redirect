@@ -146,6 +146,44 @@ pipeline {
             }
         }
 
+        stage('Code Coverage') {
+            steps {
+                echo 'Generating code coverage reports...'
+                
+                // Create coverage directory
+                sh 'mkdir -p build/coverage'
+                
+                // Run tests with coverage
+                sh 'composer test:coverage'
+            }
+
+            post {
+                always {
+                    // Publish HTML coverage report
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'build/coverage',
+                        reportFiles: 'index.html',
+                        reportName: 'Coverage Report',
+                        reportTitles: 'Code Coverage'
+                    ])
+                    
+                    // Publish Clover coverage for trend analysis
+                    publishCoverage adapters: [
+                        coberturaAdapter('build/coverage/clover.xml')
+                    ], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
+                    
+                    // Archive coverage artifacts
+                    archiveArtifacts artifacts: 'build/coverage/**/*', fingerprint: false, allowEmptyArchive: false
+                }
+                failure {
+                    echo 'Code coverage failed - check minimum threshold requirements'
+                }
+            }
+        }
+
         stage('Integration & Compatibility') {
             steps {
                 echo 'Testing Statamic integration and compatibility...'
@@ -184,18 +222,38 @@ pipeline {
                 script {
                     echo 'Evaluating build quality gates...'
                     
+                    // Check if coverage meets minimum threshold
+                    def coverageStatus = 'PASSED'
+                    try {
+                        if (fileExists('build/coverage/clover.xml')) {
+                            echo 'Coverage report found - checking thresholds...'
+                            // The composer test:coverage command will fail if minimum threshold is not met
+                            // So if we reach here, coverage passed
+                        } else {
+                            coverageStatus = 'FAILED - No coverage report found'
+                        }
+                    } catch (Exception e) {
+                        coverageStatus = 'FAILED - Coverage below threshold'
+                    }
+                    
                     // Quality gate checks
                     def qualityGates = [
                         'Code Style': 'PASSED',
                         'Static Analysis': 'PASSED', 
                         'Security': 'PASSED',
                         'Tests': 'PASSED',
-                        'Coverage': 'PASSED'
+                        'Coverage': coverageStatus
                     ]
                     
                     echo "Quality Gates Summary:"
                     qualityGates.each { gate, status ->
                         echo "  ${gate}: ${status}"
+                    }
+                    
+                    // Check if any gates failed
+                    def failedGates = qualityGates.findAll { gate, status -> status.contains('FAILED') }
+                    if (failedGates) {
+                        error "Quality gates failed: ${failedGates.keySet().join(', ')}"
                     }
                     
                     echo 'All quality gates passed! 🎉'
