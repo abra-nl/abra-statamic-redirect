@@ -28,7 +28,7 @@
         "rector/rector": "^1.0"
     },
     "require": {
-        "php": "^8.1",
+        "php": "^8.3",
         "statamic/cms": "^5.64"
     },
     "config": {
