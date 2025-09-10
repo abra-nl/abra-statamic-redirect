@@ -171,7 +171,7 @@ describe('ServiceProvider', function (): void {
 
             $navItem->shouldReceive('route')
                 ->once()
-                ->with('statamic.cp.abra-statamic-redirects.index')
+                ->with('abra-statamic-redirects.index')
                 ->andReturn($navItem);
 
             $navItem->shouldReceive('icon')
