@@ -12,18 +12,6 @@ beforeEach(function (): void {
     // Mock Nav facade to prevent navigation extension errors
     Nav::shouldReceive('extend')->byDefault();
 
-    // Mock Route facade for the redirect routes
-    Route::shouldReceive('group')
-        ->andReturnSelf()
-        ->byDefault();
-    Route::shouldReceive('name')
-        ->with('abra-statamic-redirects.')
-        ->andReturnSelf()
-        ->byDefault();
-    Route::shouldReceive('prefix')
-        ->andReturnSelf()
-        ->byDefault();
-
     // Create a fresh service provider instance
     $this->serviceProvider = new ServiceProvider($this->app);
 
@@ -183,7 +171,7 @@ describe('ServiceProvider', function (): void {
 
             $navItem->shouldReceive('route')
                 ->once()
-                ->with('statamic.cp.abra-statamic-redirects.index')
+                ->with('abra-statamic-redirects.index')
                 ->andReturn($navItem);
 
             $navItem->shouldReceive('icon')
