@@ -1,5 +1,5 @@
 {
-    "name": "abra/abra-statamic-redirect",
+    "name": "abra-nl/abra-statamic-redirect",
     "description": "A flexible redirects manager for Statamic with file-based and database storage options",
     "type": "statamic-addon",
     "license": "MIT",
