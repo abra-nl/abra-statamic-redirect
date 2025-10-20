@@ -300,6 +300,90 @@ describe('FileRedirectRepository', function (): void {
                 ->and($repository->find('/files/photo.jpg')['id'])->toBe('files-wildcard')
                 ->and($repository->find('/files/photo.png'))->toBeNull();
         });
+
+        test('applies wildcard substitution to destination', function (): void {
+            $redirects = [
+                [
+                    'id' => 'blog-to-news',
+                    'source' => '/blog/*',
+                    'destination' => '/news/*',
+                    'status_code' => 301,
+                    'created_at' => '2023-01-01T00:00:00+00:00',
+                    'updated_at' => '2023-01-01T00:00:00+00:00',
+                ],
+            ];
+
+            File::put($this->testFile, YAML::dump($redirects));
+            $repository = new FileRedirectRepository;
+
+            $result = $repository->find('/blog/title-example');
+
+            expect($result)->not->toBeNull()
+                ->and($result['destination'])->toBe('/news/title-example');
+        });
+
+        test('applies wildcard substitution with nested paths', function (): void {
+            $redirects = [
+                [
+                    'id' => 'nested-wildcard',
+                    'source' => '/old/posts/*',
+                    'destination' => '/new/articles/*',
+                    'status_code' => 301,
+                    'created_at' => '2023-01-01T00:00:00+00:00',
+                    'updated_at' => '2023-01-01T00:00:00+00:00',
+                ],
+            ];
+
+            File::put($this->testFile, YAML::dump($redirects));
+            $repository = new FileRedirectRepository;
+
+            $result = $repository->find('/old/posts/2023/january/my-post');
+
+            expect($result)->not->toBeNull()
+                ->and($result['destination'])->toBe('/new/articles/2023/january/my-post');
+        });
+
+        test('applies wildcard substitution in middle of pattern', function (): void {
+            $redirects = [
+                [
+                    'id' => 'middle-wildcard',
+                    'source' => '/blog/*/comments',
+                    'destination' => '/articles/*/discussions',
+                    'status_code' => 301,
+                    'created_at' => '2023-01-01T00:00:00+00:00',
+                    'updated_at' => '2023-01-01T00:00:00+00:00',
+                ],
+            ];
+
+            File::put($this->testFile, YAML::dump($redirects));
+            $repository = new FileRedirectRepository;
+
+            $result = $repository->find('/blog/my-post-title/comments');
+
+            expect($result)->not->toBeNull()
+                ->and($result['destination'])->toBe('/articles/my-post-title/discussions');
+        });
+
+        test('returns destination without wildcards unchanged', function (): void {
+            $redirects = [
+                [
+                    'id' => 'no-dest-wildcard',
+                    'source' => '/blog/*',
+                    'destination' => '/news/latest',
+                    'status_code' => 301,
+                    'created_at' => '2023-01-01T00:00:00+00:00',
+                    'updated_at' => '2023-01-01T00:00:00+00:00',
+                ],
+            ];
+
+            File::put($this->testFile, YAML::dump($redirects));
+            $repository = new FileRedirectRepository;
+
+            $result = $repository->find('/blog/any-post');
+
+            expect($result)->not->toBeNull()
+                ->and($result['destination'])->toBe('/news/latest');
+        });
     });
 
     describe('store', function (): void {
@@ -492,7 +576,7 @@ describe('FileRedirectRepository', function (): void {
         test('throws exception when ID not found', function (): void {
             $repository = new FileRedirectRepository;
 
-            expect(fn () => $repository->update('non-existent-id', [
+            expect(fn (): array => $repository->update('non-existent-id', [
                 'destination' => '/some-dest',
             ]))->toThrow(Exception::class, 'Redirect with ID non-existent-id not found');
 

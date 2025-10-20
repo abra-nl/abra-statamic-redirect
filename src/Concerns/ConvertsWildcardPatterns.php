@@ -40,6 +40,79 @@ trait ConvertsWildcardPatterns
     }
 
     /**
+     * Apply wildcard substitution to destination URL
+     */
+    protected function applyWildcardSubstitution(string $source, string $pattern, string $destination): string
+    {
+        // Normalize inputs
+        $normalizedSource = $this->normalizeUrl($source);
+        $normalizedPattern = $this->normalizeUrl($pattern);
+
+        // If destination doesn't contain wildcards, return as-is
+        if (! Str::contains($destination, '*')) {
+            return $destination;
+        }
+
+        // Get the regex pattern for matching
+        $regexPattern = $this->wildcardToRegex($normalizedPattern);
+
+        // Extract captured groups from the source
+        if (! preg_match($regexPattern, (string) $normalizedSource, $matches)) {
+            return $destination;
+        }
+
+        // Build array of wildcard captures
+        $captures = [];
+
+        // Special handling for patterns ending with /*
+        if (Str::endsWith($normalizedPattern, '/*')) {
+            // The first capture group contains everything after the base path
+            $captures[] = isset($matches[1]) && $matches[1] !== '' ? ltrim($matches[1], '/') : '';
+        } else {
+            // For other patterns, extract wildcards in order
+            $patternParts = explode('*', (string) $normalizedPattern);
+            $sourceCopy = $normalizedSource;
+
+            foreach ($patternParts as $i => $part) {
+                if ($i === count($patternParts) - 1) {
+                    break; // Last part, no wildcard after it
+                }
+
+                // Find position after this literal part
+                $pos = $part !== '' ? strpos((string) $sourceCopy, $part) : 0;
+                if ($pos === false) {
+                    continue;
+                }
+
+                // Move past the literal part
+                $sourceCopy = substr((string) $sourceCopy, $pos + strlen($part));
+
+                // Find where the next literal part starts
+                $nextPart = $patternParts[$i + 1] ?? '';
+                if ($nextPart !== '') {
+                    $nextPos = strpos($sourceCopy, $nextPart);
+                    if ($nextPos !== false) {
+                        $captures[] = substr($sourceCopy, 0, $nextPos);
+
+                        continue;
+                    }
+                }
+
+                // If no next part or not found, capture the rest
+                $captures[] = $sourceCopy;
+            }
+        }
+
+        // Replace wildcards in destination with captured values
+        $result = $destination;
+        foreach ($captures as $capture) {
+            $result = preg_replace('/\*/', $capture, (string) $result, 1);
+        }
+
+        return $result;
+    }
+
+    /**
      * Normalize URL for consistent matching
      */
     protected function normalizeUrl(string $url): string
