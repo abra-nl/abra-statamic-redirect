@@ -92,7 +92,12 @@ trait ConvertsWildcardPatterns
                 if ($nextPart !== '') {
                     $nextPos = strpos($sourceCopy, $nextPart);
                     if ($nextPos !== false) {
-                        $captures[] = substr($sourceCopy, 0, $nextPos);
+                        $capture = substr($sourceCopy, 0, $nextPos);
+                        // Remove trailing slash from capture if nextPart starts with slash
+                        if (Str::startsWith($nextPart, '/') && Str::endsWith($capture, '/')) {
+                            $capture = rtrim($capture, '/');
+                        }
+                        $captures[] = $capture;
 
                         continue;
                     }
