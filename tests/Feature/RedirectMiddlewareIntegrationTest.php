@@ -202,6 +202,28 @@ describe('RedirectMiddleware Integration', function (): void {
         $response->assertRedirect('/articles/some-post');
     });
 
+    test('middleware handles wildcard substitution in destination', function (): void {
+        $mockRepository = Mockery::mock(RedirectRepository::class);
+        $mockRepository->shouldReceive('find')
+            ->with('/blog/title-example')
+            ->andReturn([
+                'source' => '/blog/*',
+                'destination' => '/news/title-example',
+                'status_code' => 301,
+            ]);
+
+        app()->bind(RedirectRepository::class, fn () => $mockRepository);
+
+        config(['redirects.cache.enabled' => false]);
+
+        Route::get('/blog/title-example', fn (): ResponseFactory|Response => response('Blog post', 200));
+
+        $response = $this->get('/blog/title-example');
+
+        $response->assertStatus(301);
+        $response->assertRedirect('/news/title-example');
+    });
+
     test('middleware works with root path redirects', function (): void {
         $mockRepository = Mockery::mock(RedirectRepository::class);
         $mockRepository->shouldReceive('find')

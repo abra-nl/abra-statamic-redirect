@@ -17,6 +17,11 @@ class TestClassWithWildcardPatterns
     {
         return $this->normalizeUrl($url);
     }
+
+    public function testApplyWildcardSubstitution(string $source, string $pattern, string $destination): string
+    {
+        return $this->applyWildcardSubstitution($source, $pattern, $destination);
+    }
 }
 
 beforeEach(function (): void {
@@ -252,6 +257,108 @@ describe('ConvertsWildcardPatterns', function (): void {
                 expect(preg_match($regex, '/users/admin/profile'))->toBe(1);
                 expect(preg_match($regex, '/users/profile'))->toBe(0);
             });
+        });
+    });
+
+    describe('applyWildcardSubstitution', function (): void {
+        test('returns destination as-is when no wildcards in destination', function (): void {
+            $result = $this->testClass->testApplyWildcardSubstitution(
+                '/blog/title-example',
+                '/blog/*',
+                '/news/fixed-path',
+            );
+
+            expect($result)->toBe('/news/fixed-path');
+        });
+
+        test('replaces single wildcard in destination with captured content', function (): void {
+            $result = $this->testClass->testApplyWildcardSubstitution(
+                '/blog/title-example',
+                '/blog/*',
+                '/news/*',
+            );
+
+            expect($result)->toBe('/news/title-example');
+        });
+
+        test('handles empty wildcard capture', function (): void {
+            $result = $this->testClass->testApplyWildcardSubstitution(
+                '/blog',
+                '/blog/*',
+                '/news/*',
+            );
+
+            expect($result)->toBe('/news/');
+        });
+
+        test('handles nested paths with wildcard', function (): void {
+            $result = $this->testClass->testApplyWildcardSubstitution(
+                '/blog/2023/january/post-title',
+                '/blog/*',
+                '/articles/*',
+            );
+
+            expect($result)->toBe('/articles/2023/january/post-title');
+        });
+
+        test('replaces wildcard in middle of pattern', function (): void {
+            $result = $this->testClass->testApplyWildcardSubstitution(
+                '/blog/my-post/comments',
+                '/blog/*/comments',
+                '/articles/*/discussions',
+            );
+
+            expect($result)->toBe('/articles/my-post/discussions');
+        });
+
+        test('handles multiple wildcards', function (): void {
+            $result = $this->testClass->testApplyWildcardSubstitution(
+                '/v1/api/users/data',
+                '/*/api/*/data',
+                '/*/rest/*/info',
+            );
+
+            expect($result)->toBe('/v1/rest/users/info');
+        });
+
+        test('handles wildcard at beginning', function (): void {
+            $result = $this->testClass->testApplyWildcardSubstitution(
+                'prefix/admin',
+                '*/admin',
+                '*/dashboard',
+            );
+
+            expect($result)->toBe('prefix/dashboard');
+        });
+
+        test('preserves special characters in captured content', function (): void {
+            $result = $this->testClass->testApplyWildcardSubstitution(
+                '/blog/post-with-dashes',
+                '/blog/*',
+                '/news/*',
+            );
+
+            expect($result)->toBe('/news/post-with-dashes');
+        });
+
+        test('handles URL with dots in path', function (): void {
+            $result = $this->testClass->testApplyWildcardSubstitution(
+                '/files/image.jpg',
+                '/files/*',
+                '/media/*',
+            );
+
+            expect($result)->toBe('/media/image.jpg');
+        });
+
+        test('handles complex multi-wildcard substitution', function (): void {
+            $result = $this->testClass->testApplyWildcardSubstitution(
+                '/archive/2023/posts',
+                '/archive/*/posts',
+                '/blog/*',
+            );
+
+            expect($result)->toBe('/blog/2023');
         });
     });
 });

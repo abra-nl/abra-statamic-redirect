@@ -80,6 +80,13 @@ class FileRedirectRepository implements RedirectRepository
 
                 // Test the regex against the normalized source
                 if (preg_match($regexPattern, $normalizedSource)) {
+                    // Apply wildcard substitution to destination
+                    $redirect['destination'] = $this->applyWildcardSubstitution(
+                        $source,
+                        $pattern,
+                        $redirect['destination'],
+                    );
+
                     return $redirect;
                 }
             }
