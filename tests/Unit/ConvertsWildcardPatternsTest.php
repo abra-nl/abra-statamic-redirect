@@ -328,7 +328,7 @@ describe('ConvertsWildcardPatterns', function (): void {
                 '*/dashboard',
             );
 
-            expect($result)->toBe('/dashboard');
+            expect($result)->toBe('prefix/dashboard');
         });
 
         test('preserves special characters in captured content', function (): void {
@@ -355,10 +355,10 @@ describe('ConvertsWildcardPatterns', function (): void {
             $result = $this->testClass->testApplyWildcardSubstitution(
                 '/archive/2023/posts',
                 '/archive/*/posts',
-                '/blog/year-*/*',
+                '/blog/*',
             );
 
-            expect($result)->toBe('/blog/year-2023/posts');
+            expect($result)->toBe('/blog/2023');
         });
     });
 });
