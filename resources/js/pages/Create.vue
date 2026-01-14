@@ -19,6 +19,7 @@ const props = defineProps({
         :submit-text="'Create redirect'"
         :status-codes="statusCodes"
         :redirect="null"
+        method="post"
       />
     </Card>
   </div>

@@ -17,9 +17,10 @@ const props = defineProps({
     <Card>
       <RedirectForm
           :action="cp_url(`redirects/${redirect['id']}`)"
-          :submit-text="'Create redirect'"
+          :submit-text="'Update redirect'"
           :status-codes="statusCodes"
           :redirect="redirect"
+          method="patch"
       />
     </Card>
   </div>

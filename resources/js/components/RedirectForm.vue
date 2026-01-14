@@ -2,6 +2,7 @@
 import { Button, Field, Input, Select} from '@statamic/cms/ui';
 
 const props = defineProps({
+  method: String,
   action: String,
   redirect: Object,
   submitText: String,
@@ -24,7 +25,7 @@ const options = Object.entries(props.statusCodes).map(([value, label]) => ({
 </script>
 
 <template>
-  <form @submit.prevent="form.post(action)" class="space-y-4">
+  <form @submit.prevent="method == 'post' ? form.post(action) : form.patch(action)" class="space-y-4">
     <Field required  label="Source" name="source" instructions-below instructions="The URL path to redirect from. Do not include the domain.">
       <Input type="text" name="source" v-model="form.source"  />
     </Field>
