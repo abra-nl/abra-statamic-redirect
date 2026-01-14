@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { router } from '@statamic/cms/inertia';
 import { Button, Card, ConfirmationModal, EmptyStateMenu, EmptyStateItem, Header, Table, TableColumns, TableColumn, TableRows,TableRow, TableCell } from '@statamic/cms/ui';
 
 const props = defineProps({
