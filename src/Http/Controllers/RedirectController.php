@@ -27,9 +27,9 @@ class RedirectController extends CpController
         ]);
     }
 
-    public function create(): View
+    public function create(): Response
     {
-        return view('abra-redirects::create', [
+        return Inertia::render('abra-redirects::Create', [
             'statusCodes' => config('redirects.status_codes'),
         ]);
     }
@@ -61,16 +61,17 @@ class RedirectController extends CpController
     /**
      * Show the form for editing a redirect
      */
-    public function edit(string $id): View|RedirectResponse
+    public function edit(string $id): Response
     {
         $redirects = $this->redirects->all();
         $redirect = collect($redirects)->firstWhere('id', $id);
 
         if (! $redirect) {
-            return redirect()->route('statamic.cp.abra-statamic-redirects.index')->with('error', 'Redirect not found.');
+            // TODO - Render error
+            return Inertia::render('abra-redirects::Index');
         }
 
-        return view('abra-redirects::edit', [
+        return Inertia::render('abra-redirects::Edit', [
             'redirect' => $redirect,
             'statusCodes' => config('redirects.status_codes'),
         ]);
