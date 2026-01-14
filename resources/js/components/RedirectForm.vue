@@ -9,7 +9,7 @@ const props = defineProps({
   statusCodes: Object,
 });
 
-import { useForm } from '@inertiajs/vue3'
+import { useForm } from '@statamic/cms/inertia'
 
 const form = useForm({
   source: props.redirect?.source ?? null,
@@ -26,15 +26,15 @@ const options = Object.entries(props.statusCodes).map(([value, label]) => ({
 
 <template>
   <form @submit.prevent="method == 'post' ? form.post(action) : form.patch(action)" class="space-y-4">
-    <Field required  label="Source" name="source" instructions-below instructions="The URL path to redirect from. Do not include the domain.">
+    <Field required  label="Source" name="source" instructions-below instructions="The URL path to redirect from. Do not include the domain." :error="form.errors.source">
       <Input type="text" name="source" v-model="form.source"  />
     </Field>
 
-    <Field required label="Destination" name="destination" instructions="The URL to redirect to. Can be a full URL or a relative path." instructions-below>
+    <Field required label="Destination" name="destination" instructions="The URL to redirect to. Can be a full URL or a relative path." instructions-below :error="form.errors.destination">
       <Input type="text" name="destination" v-model="form.destination" />
     </Field>
 
-    <Field label="Status code" name="status_code" instructions="The HTTP status code to use for the redirect." instructions-below>
+    <Field required label="Status code" name="status_code" instructions="The HTTP status code to use for the redirect." instructions-below :error="form.errors.status_code">
       <Select label="Status code" name="status_code" :options="options" v-model="form.status_code" />
     </Field>
 
