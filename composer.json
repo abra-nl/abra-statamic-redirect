@@ -29,7 +29,7 @@
     },
     "require": {
         "php": "^8.3",
-        "statamic/cms": "^5.64"
+        "statamic/cms": "^6.0"
     },
     "config": {
         "allow-plugins": {
@@ -48,6 +48,7 @@
         ]
       }
     },
+    "minimum-stability": "beta",
     "scripts": {
         "test": "pest",
         "test:unit": "pest tests/Unit",
