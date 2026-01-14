@@ -35,6 +35,7 @@ const confirmDelete = () => {
         <EmptyStateItem
             icon="link"
             heading="Create redirect"
+            :href="cp_url('redirects/create')"
             description="Create a redirect from one URL to another. Use wildcards to match multiple URLs."
         />
       </EmptyStateMenu>
