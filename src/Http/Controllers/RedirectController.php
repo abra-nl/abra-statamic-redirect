@@ -6,6 +6,8 @@ use Abra\AbraStatamicRedirect\Interfaces\RedirectRepository;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 use Statamic\Http\Controllers\CP\CpController;
 
 class RedirectController extends CpController
@@ -15,11 +17,11 @@ class RedirectController extends CpController
     /**
      * Display a listing of redirects
      */
-    public function index(): View
+    public function index(): Response
     {
         $redirects = $this->redirects->all();
 
-        return view('abra-redirects::index', [
+        return Inertia::render('abra-redirects::Index', [
             'redirects' => $redirects,
             'statusCodes' => config('redirects.status_codes'),
         ]);
