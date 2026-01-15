@@ -1,0 +1,16 @@
+name: Build Laravel framework
+
+on:
+  push:
+    branches: [main, 2.x]
+  pull_request:
+    branches: [main, 2.x]
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    uses: abra-nl/abra-workflows/.github/workflows/laravel-framework.yml@development
+    secrets: inherit
