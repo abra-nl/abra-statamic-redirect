@@ -184,7 +184,7 @@ jobs:
           chmod 755 .phpunit.cache
 
       - name: Run ${{ matrix.test-suite.name }} tests
-        run: ./vendor/bin/pest ${{ matrix.test-suite.path }}
+        run: ./vendor/bin/pest ${{ matrix.test-suite.path }} --no-coverage
 
   coverage:
     name: Code Coverage - PHP 8.3
