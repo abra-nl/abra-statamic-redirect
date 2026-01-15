@@ -57,7 +57,7 @@ describe('RedirectController', function (): void {
             ->component('abra-redirects::Index')
             ->has('redirects', 2)
             ->where('redirects', $redirects)
-            ->where('statusCodes', [301 => 'Permanent', 302 => 'Temporary'])
+            ->where('statusCodes', [301 => 'Permanent', 302 => 'Temporary']),
         );
     });
 
@@ -69,7 +69,7 @@ describe('RedirectController', function (): void {
         $response->assertStatus(200);
         $response->assertInertia(fn (Assert $assert) => $assert
             ->component('abra-redirects::Create')
-            ->where('statusCodes', [301 => 'Permanent', 302 => 'Temporary'])
+            ->where('statusCodes', [301 => 'Permanent', 302 => 'Temporary']),
         );
     });
 
@@ -143,7 +143,7 @@ describe('RedirectController', function (): void {
         $response->assertInertia(fn (Assert $assert) => $assert
             ->component('abra-redirects::Edit')
             ->where('redirect', $this->sampleRedirect)
-            ->where('statusCodes', [301 => 'Permanent', 302 => 'Temporary'])
+            ->where('statusCodes', [301 => 'Permanent', 302 => 'Temporary']),
         );
     });
 
@@ -157,7 +157,7 @@ describe('RedirectController', function (): void {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (Assert $assert) => $assert
-            ->component('abra-redirects::Index')
+            ->component('abra-redirects::Index'),
         );
     });
 
