@@ -3,7 +3,6 @@
 namespace Abra\AbraStatamicRedirect\Http\Controllers;
 
 use Abra\AbraStatamicRedirect\Interfaces\RedirectRepository;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;

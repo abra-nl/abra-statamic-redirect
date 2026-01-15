@@ -17,6 +17,7 @@ class ServiceProvider extends AddonServiceProvider
         ],
     ];
 
+    // @phpstan-ignore-next-line
     protected $vite = [
         'input' => [
             'resources/js/addon.js',
