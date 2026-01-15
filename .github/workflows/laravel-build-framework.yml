@@ -12,5 +12,5 @@ concurrency:
 
 jobs:
   build:
-    uses: abra-nl/abra-workflows/.github/workflows/laravel-framework.yml@development
+    uses: abra-nl/abra-workflows/.github/workflows/laravel-framework@development
     secrets: inherit
