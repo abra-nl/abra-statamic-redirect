@@ -228,7 +228,7 @@ jobs:
         run: composer test:coverage
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         with:
           files: ./build/coverage/clover.xml
           flags: unittests
@@ -237,7 +237,7 @@ jobs:
         continue-on-error: true
 
       - name: Archive coverage results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: build/coverage/
