@@ -176,7 +176,7 @@ describe('ServiceProvider', function (): void {
 
             $navItem->shouldReceive('icon')
                 ->once()
-                ->with('list')
+                ->with('add-link')
                 ->andReturn($navItem);
 
             // Execute the captured closure

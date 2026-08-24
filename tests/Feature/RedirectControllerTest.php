@@ -53,7 +53,7 @@ describe('RedirectController', function (): void {
         $response = $this->get(cp_route('abra-statamic-redirects.index'));
 
         $response->assertStatus(200);
-        $response->assertInertia(fn (Assert $assert) => $assert
+        $response->assertInertia(fn (Assert $assert): Assert => $assert
             ->component('abra-redirects::Index')
             ->has('redirects', 2)
             ->where('redirects', $redirects)
@@ -67,7 +67,7 @@ describe('RedirectController', function (): void {
         $response = $this->get(cp_route('abra-statamic-redirects.create'));
 
         $response->assertStatus(200);
-        $response->assertInertia(fn (Assert $assert) => $assert
+        $response->assertInertia(fn (Assert $assert): Assert => $assert
             ->component('abra-redirects::Create')
             ->where('statusCodes', [301 => 'Permanent', 302 => 'Temporary']),
         );
@@ -140,7 +140,7 @@ describe('RedirectController', function (): void {
         $response = $this->get(cp_route('abra-statamic-redirects.edit', ['id' => '123']));
 
         $response->assertStatus(200);
-        $response->assertInertia(fn (Assert $assert) => $assert
+        $response->assertInertia(fn (Assert $assert): Assert => $assert
             ->component('abra-redirects::Edit')
             ->where('redirect', $this->sampleRedirect)
             ->where('statusCodes', [301 => 'Permanent', 302 => 'Temporary']),
@@ -156,7 +156,7 @@ describe('RedirectController', function (): void {
         $response = $this->get(cp_route('abra-statamic-redirects.edit', ['id' => 'nonexistent']));
 
         $response->assertStatus(200);
-        $response->assertInertia(fn (Assert $assert) => $assert
+        $response->assertInertia(fn (Assert $assert): Assert => $assert
             ->component('abra-redirects::Index'),
         );
     });
