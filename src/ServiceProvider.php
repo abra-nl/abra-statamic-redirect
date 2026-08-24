@@ -35,8 +35,6 @@ class ServiceProvider extends AddonServiceProvider
             __DIR__.'/../database/migrations/' => database_path('migrations'),
         ]);
 
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'abra-redirects');
-
         $this->loadJsonTranslationsFrom(__DIR__.'/../resources/lang');
 
         $this->app->bind(RedirectRepository::class, function (): DatabaseRedirectRepository|FileRedirectRepository {

@@ -184,37 +184,6 @@ describe('ServiceProvider', function (): void {
         });
     });
 
-    describe('view loading', function (): void {
-        test('loads views from correct namespace and path', function (): void {
-            $this->serviceProvider->bootAddon();
-
-            // Verify views are loaded with correct namespace
-            $hints = $this->app['view']->getFinder()->getHints();
-
-            expect($hints)->toHaveKey('abra-redirects');
-
-            // Check if any view path contains 'resources/views'
-            $viewPathFound = false;
-            foreach ($hints['abra-redirects'] as $path) {
-                if (str_contains($path, 'resources/views')) {
-                    $viewPathFound = true;
-                    break;
-                }
-            }
-
-            expect($viewPathFound)->toBeTrue();
-        });
-
-        test('view files exist in the specified directory', function (): void {
-            $viewsPath = __DIR__.'/../../resources/views';
-
-            expect(File::exists($viewsPath.'/index.blade.php'))->toBeTrue()
-                ->and(File::exists($viewsPath.'/edit.blade.php'))->toBeTrue()
-                ->and(File::exists($viewsPath.'/create.blade.php'))->toBeTrue()
-                ->and(File::exists($viewsPath.'/components/form.blade.php'))->toBeTrue();
-        });
-    });
-
     describe('migration publishing', function (): void {
         test('publishes migrations to correct directory', function (): void {
             $this->serviceProvider->bootAddon();
@@ -256,10 +225,6 @@ describe('ServiceProvider', function (): void {
 
             // Verify configuration is available
             expect(config('redirects.storage'))->toBe('file');
-
-            // Verify views are loadable
-            $hints = $this->app['view']->getFinder()->getHints();
-            expect($hints)->toHaveKey('abra-redirects');
         });
 
         test('switching storage types works correctly', function (): void {
