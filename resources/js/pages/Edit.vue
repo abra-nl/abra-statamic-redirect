@@ -11,13 +11,13 @@ const props = defineProps({
 
 <template>
   <div>
-    <Header title="Edit redirect">
-      <Button text="Back to list" variant="primary" :href="cp_url('redirects')" />
+    <Header :title="__('Edit redirect')">
+      <Button :text="__('Back to list')" variant="primary" :href="cp_url('redirects')" />
     </Header>
     <Card>
       <RedirectForm
           :action="cp_url(`redirects/${redirect['id']}`)"
-          :submit-text="'Update redirect'"
+          :submit-text="__('Update redirect')"
           :status-codes="statusCodes"
           :redirect="redirect"
           method="patch"

@@ -35,7 +35,7 @@ class ServiceProvider extends AddonServiceProvider
             __DIR__.'/../database/migrations/' => database_path('migrations'),
         ]);
 
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'abra-redirects');
+        $this->loadJsonTranslationsFrom(__DIR__.'/../resources/lang');
 
         $this->app->bind(RedirectRepository::class, function (): DatabaseRedirectRepository|FileRedirectRepository {
             $storage = config('redirects.storage', 'file');
@@ -48,10 +48,10 @@ class ServiceProvider extends AddonServiceProvider
         });
 
         Nav::extend(function ($nav): void {
-            $nav->create('Redirects')
+            $nav->create(__('Redirects'))
                 ->section('Settings')
                 ->route('abra-statamic-redirects.index')
-                ->icon('list');
+                ->icon('add-link');
         });
     }
 

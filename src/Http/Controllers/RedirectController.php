@@ -49,12 +49,12 @@ class RedirectController extends CpController
 
         // Check if source already exists
         if ($this->redirects->exists($validated['source'])) {
-            return back()->withErrors(['source' => 'A redirect with this source URL already exists.'])->withInput();
+            return back()->withErrors(['source' => __('A redirect with this source URL already exists.')])->withInput();
         }
 
         $this->redirects->store($validated);
 
-        return redirect()->route('statamic.cp.abra-statamic-redirects.index')->with('success', 'Redirect created successfully.');
+        return redirect()->route('statamic.cp.abra-statamic-redirects.index')->with('success', __('Redirect created successfully.'));
     }
 
     /**
@@ -95,12 +95,12 @@ class RedirectController extends CpController
 
         // Check if source already exists (excluding this redirect)
         if ($this->redirects->exists($validated['source'], $id)) {
-            return back()->withErrors(['source' => 'A redirect with this source URL already exists.'])->withInput();
+            return back()->withErrors(['source' => __('A redirect with this source URL already exists.')])->withInput();
         }
 
         $this->redirects->update($id, $validated);
 
-        return redirect()->route('statamic.cp.abra-statamic-redirects.index')->with('success', 'Redirect updated successfully.');
+        return redirect()->route('statamic.cp.abra-statamic-redirects.index')->with('success', __('Redirect updated successfully.'));
     }
 
     /**
@@ -112,6 +112,6 @@ class RedirectController extends CpController
     {
         $this->redirects->delete($id);
 
-        return redirect()->route('statamic.cp.abra-statamic-redirects.index')->with('success', 'Redirect deleted successfully.');
+        return redirect()->route('statamic.cp.abra-statamic-redirects.index')->with('success', __('Redirect deleted successfully.'));
     }
 }

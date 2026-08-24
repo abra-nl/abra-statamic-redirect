@@ -97,6 +97,7 @@ trait ConvertsWildcardPatterns
                         if (Str::startsWith($nextPart, '/') && Str::endsWith($capture, '/')) {
                             $capture = rtrim($capture, '/');
                         }
+
                         $captures[] = $capture;
 
                         continue;

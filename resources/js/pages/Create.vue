@@ -10,13 +10,13 @@ const props = defineProps({
 
 <template>
   <div>
-    <Header title="Create redirect">
-      <Button text="Back to list" variant="primary" :href="cp_url('redirects')" />
+    <Header :title="__('Create redirect')">
+      <Button :text="__('Back to list')" variant="primary" :href="cp_url('redirects')" />
     </Header>
     <Card>
       <RedirectForm
         :action="cp_url('redirects/store')"
-        :submit-text="'Create redirect'"
+        :submit-text="__('Create redirect')"
         :status-codes="statusCodes"
         :redirect="null"
         method="post"
