@@ -1,6 +1,7 @@
 <?php
 
 use Abra\AbraStatamicRedirect\Interfaces\RedirectRepository;
+use Inertia\Testing\AssertableInertia as Assert;
 use Statamic\Facades\User;
 
 beforeEach(function (): void {
@@ -52,9 +53,12 @@ describe('RedirectController', function (): void {
         $response = $this->get(cp_route('abra-statamic-redirects.index'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('abra-redirects::index');
-        $response->assertViewHas('redirects', $redirects);
-        $response->assertViewHas('statusCodes', [301 => 'Permanent', 302 => 'Temporary']);
+        $response->assertInertia(fn (Assert $assert): Assert => $assert
+            ->component('abra-redirects::Index')
+            ->has('redirects', 2)
+            ->where('redirects', $redirects)
+            ->where('statusCodes', [301 => 'Permanent', 302 => 'Temporary']),
+        );
     });
 
     test('create displays create form', function (): void {
@@ -63,8 +67,10 @@ describe('RedirectController', function (): void {
         $response = $this->get(cp_route('abra-statamic-redirects.create'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('abra-redirects::create');
-        $response->assertViewHas('statusCodes', [301 => 'Permanent', 302 => 'Temporary']);
+        $response->assertInertia(fn (Assert $assert): Assert => $assert
+            ->component('abra-redirects::Create')
+            ->where('statusCodes', [301 => 'Permanent', 302 => 'Temporary']),
+        );
     });
 
     test('store creates new redirect successfully', function (): void {
@@ -134,12 +140,14 @@ describe('RedirectController', function (): void {
         $response = $this->get(cp_route('abra-statamic-redirects.edit', ['id' => '123']));
 
         $response->assertStatus(200);
-        $response->assertViewIs('abra-redirects::edit');
-        $response->assertViewHas('redirect', $this->sampleRedirect);
-        $response->assertViewHas('statusCodes', [301 => 'Permanent', 302 => 'Temporary']);
+        $response->assertInertia(fn (Assert $assert): Assert => $assert
+            ->component('abra-redirects::Edit')
+            ->where('redirect', $this->sampleRedirect)
+            ->where('statusCodes', [301 => 'Permanent', 302 => 'Temporary']),
+        );
     });
 
-    test('edit redirects when redirect not found', function (): void {
+    test('edit renders index when redirect not found', function (): void {
         $this->redirectRepository
             ->shouldReceive('all')
             ->once()
@@ -147,8 +155,10 @@ describe('RedirectController', function (): void {
 
         $response = $this->get(cp_route('abra-statamic-redirects.edit', ['id' => 'nonexistent']));
 
-        $response->assertRedirect(cp_route('abra-statamic-redirects.index'));
-        $response->assertSessionHas('error', 'Redirect not found.');
+        $response->assertStatus(200);
+        $response->assertInertia(fn (Assert $assert): Assert => $assert
+            ->component('abra-redirects::Index'),
+        );
     });
 
     test('update modifies existing redirect successfully', function (): void {

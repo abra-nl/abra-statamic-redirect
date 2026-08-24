@@ -6,6 +6,8 @@ composer.lock
 .idea
 tests/__fixtures__
 
+/resources/dist/hot
+
 # Code coverage reports
 coverage-html/
 coverage.xml
