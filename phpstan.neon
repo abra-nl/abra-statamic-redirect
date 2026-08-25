@@ -28,9 +28,6 @@ parameters:
         - '#Call to an undefined static method Illuminate\\Support\\Facades\\#'
         - '#Access to an undefined property Illuminate\\Support\\Facades\\#'
     
-    # Memory limit for analysis
-    memoryLimitFile: 512M
-    
     # Enable bleeding edge features
     reportUnmatchedIgnoredErrors: false
     
