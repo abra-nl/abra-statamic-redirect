@@ -25,7 +25,7 @@ describe('RedirectMiddleware', function (): void {
 
         $this->redirectRepository
             ->shouldReceive('find')
-            ->with('/test-path')
+            ->with('/test-path', 'localhost')
             ->once()
             ->andReturn(null);
 
@@ -43,7 +43,7 @@ describe('RedirectMiddleware', function (): void {
 
         $this->redirectRepository
             ->shouldReceive('find')
-            ->with('/old-page')
+            ->with('/old-page', 'localhost')
             ->once()
             ->andReturn([
                 'source' => '/old-page',
@@ -95,7 +95,7 @@ describe('RedirectMiddleware', function (): void {
 
         $this->redirectRepository
             ->shouldReceive('find')
-            ->with('/old-page')
+            ->with('/old-page', 'localhost')
             ->once()
             ->andReturn([
                 'source' => '/old-page',
@@ -120,7 +120,7 @@ describe('RedirectMiddleware', function (): void {
 
         $this->redirectRepository
             ->shouldReceive('find')
-            ->with('/old-page')
+            ->with('/old-page', 'localhost')
             ->once()
             ->andReturn([
                 'source' => '/old-page',
@@ -142,7 +142,7 @@ describe('RedirectMiddleware', function (): void {
 
         $this->redirectRepository
             ->shouldReceive('find')
-            ->with('/')
+            ->with('/', 'localhost')
             ->once()
             ->andReturn([
                 'source' => '/',
@@ -164,7 +164,7 @@ describe('RedirectMiddleware', function (): void {
 
         $this->redirectRepository
             ->shouldReceive('find')
-            ->with('/test-path')
+            ->with('/test-path', 'localhost')
             ->once()
             ->andReturn(null);
 
@@ -193,7 +193,7 @@ describe('RedirectMiddleware', function (): void {
 
         $this->redirectRepository
             ->shouldReceive('find')
-            ->with('/cached-page')
+            ->with('/cached-page', 'localhost')
             ->once()
             ->andReturn($redirect);
 
@@ -206,7 +206,7 @@ describe('RedirectMiddleware', function (): void {
         expect($response->getStatusCode())->toBe(301);
 
         // Verify cache was set
-        $cacheKey = 'redirect_for_path_'.md5('/cached-page');
+        $cacheKey = 'redirect_for_path_'.md5('localhost|/cached-page');
         expect(Cache::has($cacheKey))->toBeTrue();
         expect(Cache::get($cacheKey))->toBe($redirect);
     });
@@ -224,7 +224,7 @@ describe('RedirectMiddleware', function (): void {
         ];
 
         // Pre-populate cache
-        $cacheKey = 'redirect_for_path_'.md5('/cached-page');
+        $cacheKey = 'redirect_for_path_'.md5('localhost|/cached-page');
         Cache::put($cacheKey, $redirect, 60);
 
         // Repository should NOT be called since we have cached data
@@ -250,7 +250,7 @@ describe('RedirectMiddleware', function (): void {
 
         $this->redirectRepository
             ->shouldReceive('find')
-            ->with('/non-existent')
+            ->with('/non-existent', 'localhost')
             ->once()
             ->andReturn(null);
 
@@ -262,7 +262,7 @@ describe('RedirectMiddleware', function (): void {
         expect($response->getContent())->toBe('Original content');
 
         // Verify null results are not cached
-        $cacheKey = 'redirect_for_path_'.md5('/non-existent');
+        $cacheKey = 'redirect_for_path_'.md5('localhost|/non-existent');
         expect(Cache::has($cacheKey))->toBeFalse();
     });
 
@@ -274,7 +274,7 @@ describe('RedirectMiddleware', function (): void {
         foreach ($statusCodes as $statusCode) {
             $this->redirectRepository
                 ->shouldReceive('find')
-                ->with('/test-'.$statusCode)
+                ->with('/test-'.$statusCode, 'localhost')
                 ->once()
                 ->andReturn([
                     'source' => '/test-'.$statusCode,

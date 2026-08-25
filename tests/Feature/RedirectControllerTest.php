@@ -78,7 +78,7 @@ describe('RedirectController', function (): void {
 
         $this->redirectRepository
             ->shouldReceive('exists')
-            ->with($this->validRedirectData['source'])
+            ->with($this->validRedirectData['source'], null)
             ->once()
             ->andReturn(false);
 
@@ -94,12 +94,35 @@ describe('RedirectController', function (): void {
         $response->assertSessionHas('success', 'Redirect created successfully.');
     });
 
+    test('store creates new redirect scoped to a host', function (): void {
+        config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
+
+        $hostScopedData = array_merge($this->validRedirectData, ['host' => 'abra.nl']);
+
+        $this->redirectRepository
+            ->shouldReceive('exists')
+            ->with($hostScopedData['source'], 'abra.nl')
+            ->once()
+            ->andReturn(false);
+
+        $this->redirectRepository
+            ->shouldReceive('store')
+            ->with($hostScopedData)
+            ->once()
+            ->andReturn(array_merge($hostScopedData, ['id' => '789']));
+
+        $response = $this->post(cp_route('abra-statamic-redirects.store'), $hostScopedData);
+
+        $response->assertRedirect(cp_route('abra-statamic-redirects.index'));
+        $response->assertSessionHas('success', 'Redirect created successfully.');
+    });
+
     test('store fails when source already exists', function (): void {
         config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
 
         $this->redirectRepository
             ->shouldReceive('exists')
-            ->with($this->validRedirectData['source'])
+            ->with($this->validRedirectData['source'], null)
             ->once()
             ->andReturn(true);
 
@@ -172,7 +195,7 @@ describe('RedirectController', function (): void {
 
         $this->redirectRepository
             ->shouldReceive('exists')
-            ->with($updatedData['source'], '123')
+            ->with($updatedData['source'], null, '123')
             ->once()
             ->andReturn(false);
 
@@ -193,7 +216,7 @@ describe('RedirectController', function (): void {
 
         $this->redirectRepository
             ->shouldReceive('exists')
-            ->with($this->validRedirectData['source'], '123')
+            ->with($this->validRedirectData['source'], null, '123')
             ->once()
             ->andReturn(true);
 

@@ -21,7 +21,7 @@ describe('RedirectMiddleware Integration', function (): void {
         // Mock the repository with a redirect
         $mockRepository = Mockery::mock(RedirectRepository::class);
         $mockRepository->shouldReceive('find')
-            ->with('/integration-test')
+            ->with('/integration-test', 'localhost')
             ->andReturn([
                 'source' => '/integration-test',
                 'destination' => '/integration-destination',
@@ -48,7 +48,7 @@ describe('RedirectMiddleware Integration', function (): void {
         // Mock the repository with no redirect
         $mockRepository = Mockery::mock(RedirectRepository::class);
         $mockRepository->shouldReceive('find')
-            ->with('/normal-page')
+            ->with('/normal-page', 'localhost')
             ->andReturn(null);
 
         app()->bind(RedirectRepository::class, fn () => $mockRepository);
@@ -90,7 +90,7 @@ describe('RedirectMiddleware Integration', function (): void {
     test('middleware preserves query parameters in real HTTP redirects', function (): void {
         $mockRepository = Mockery::mock(RedirectRepository::class);
         $mockRepository->shouldReceive('find')
-            ->with('/query-test')
+            ->with('/query-test', 'localhost')
             ->andReturn([
                 'source' => '/query-test',
                 'destination' => '/query-destination',
@@ -119,7 +119,7 @@ describe('RedirectMiddleware Integration', function (): void {
     test('middleware works with different HTTP methods', function (): void {
         $mockRepository = Mockery::mock(RedirectRepository::class);
         $mockRepository->shouldReceive('find')
-            ->with('/api-endpoint')
+            ->with('/api-endpoint', 'localhost')
             ->times(2) // Called for both POST and PUT
             ->andReturn([
                 'source' => '/api-endpoint',
@@ -153,7 +153,7 @@ describe('RedirectMiddleware Integration', function (): void {
 
         $mockRepository = Mockery::mock(RedirectRepository::class);
         $mockRepository->shouldReceive('find')
-            ->with('/cached-integration')
+            ->with('/cached-integration', 'localhost')
             ->once() // Should only be called once due to caching
             ->andReturn([
                 'source' => '/cached-integration',
@@ -176,14 +176,14 @@ describe('RedirectMiddleware Integration', function (): void {
         $response2->assertRedirect('/cached-integration-destination');
 
         // Verify cache exists
-        $cacheKey = 'redirect_for_path_'.md5('/cached-integration');
+        $cacheKey = 'redirect_for_path_'.md5('localhost|/cached-integration');
         expect(Cache::has($cacheKey))->toBeTrue();
     });
 
     test('middleware handles wildcard redirects through repository', function (): void {
         $mockRepository = Mockery::mock(RedirectRepository::class);
         $mockRepository->shouldReceive('find')
-            ->with('/blog/some-post')
+            ->with('/blog/some-post', 'localhost')
             ->andReturn([
                 'source' => '/blog/*',
                 'destination' => '/articles/some-post',
@@ -205,7 +205,7 @@ describe('RedirectMiddleware Integration', function (): void {
     test('middleware handles wildcard substitution in destination', function (): void {
         $mockRepository = Mockery::mock(RedirectRepository::class);
         $mockRepository->shouldReceive('find')
-            ->with('/blog/title-example')
+            ->with('/blog/title-example', 'localhost')
             ->andReturn([
                 'source' => '/blog/*',
                 'destination' => '/news/title-example',
@@ -227,7 +227,7 @@ describe('RedirectMiddleware Integration', function (): void {
     test('middleware works with root path redirects', function (): void {
         $mockRepository = Mockery::mock(RedirectRepository::class);
         $mockRepository->shouldReceive('find')
-            ->with('/')
+            ->with('/', 'localhost')
             ->andReturn([
                 'source' => '/',
                 'destination' => '/welcome',
@@ -252,7 +252,7 @@ describe('RedirectMiddleware Integration', function (): void {
         foreach ($statusCodes as $statusCode) {
             $mockRepository = Mockery::mock(RedirectRepository::class);
             $mockRepository->shouldReceive('find')
-                ->with('/status-'.$statusCode)
+                ->with('/status-'.$statusCode, 'localhost')
                 ->andReturn([
                     'source' => '/status-'.$statusCode,
                     'destination' => '/new-status-'.$statusCode,
@@ -275,7 +275,7 @@ describe('RedirectMiddleware Integration', function (): void {
     test('middleware handles complex query parameter scenarios', function (): void {
         $mockRepository = Mockery::mock(RedirectRepository::class);
         $mockRepository->shouldReceive('find')
-            ->with('/complex-query')
+            ->with('/complex-query', 'localhost')
             ->andReturn([
                 'source' => '/complex-query',
                 'destination' => '/new-complex?existing=true&default=1',

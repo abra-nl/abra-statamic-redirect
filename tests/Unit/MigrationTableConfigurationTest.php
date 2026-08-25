@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 describe('Migration Table Configuration', function (): void {
     test('migration creates table with default name when not configured', function (): void {
@@ -21,6 +23,7 @@ describe('Migration Table Configuration', function (): void {
         // Verify the default table was created
         expect(Schema::hasTable('redirects'))->toBeTrue()
             ->and(Schema::hasColumn('redirects', 'id'))->toBeTrue()
+            ->and(Schema::hasColumn('redirects', 'host'))->toBeTrue()
             ->and(Schema::hasColumn('redirects', 'source'))->toBeTrue()
             ->and(Schema::hasColumn('redirects', 'destination'))->toBeTrue()
             ->and(Schema::hasColumn('redirects', 'status_code'))->toBeTrue()
@@ -30,6 +33,53 @@ describe('Migration Table Configuration', function (): void {
         // Verify the table structure
 
         // Clean up
+        $migration->down();
+        expect(Schema::hasTable('redirects'))->toBeFalse();
+    });
+
+    test('migration creates host column defaulting to empty string and a composite unique index', function (): void {
+        config(['redirects' => []]);
+
+        $migrationPath = __DIR__.'/../../database/migrations/2025_05_08_100000_create_redirects_table.php';
+        require_once $migrationPath;
+
+        $migration = new CreateRedirectsTable;
+
+        Schema::dropIfExists('redirects');
+        $migration->up();
+
+        DB::table('redirects')->insert([
+            'id' => (string) Str::uuid(),
+            'source' => '/legacy-source',
+            'destination' => '/legacy-destination',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $row = DB::table('redirects')->where('source', '/legacy-source')->first();
+        expect($row->host)->toBe('');
+
+        // Composite unique(['host', 'source']) allows the same source for
+        // different hosts, but not twice for the same host.
+        DB::table('redirects')->insert([
+            'id' => (string) Str::uuid(),
+            'host' => 'abra.nl',
+            'source' => '/legacy-source',
+            'destination' => '/nl-destination',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        expect(DB::table('redirects')->where('source', '/legacy-source')->count())->toBe(2);
+
+        expect(fn () => DB::table('redirects')->insert([
+            'id' => (string) Str::uuid(),
+            'source' => '/legacy-source',
+            'destination' => '/duplicate-destination',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]))->toThrow(Exception::class);
+
         $migration->down();
         expect(Schema::hasTable('redirects'))->toBeFalse();
     });

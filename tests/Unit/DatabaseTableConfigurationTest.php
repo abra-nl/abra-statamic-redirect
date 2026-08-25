@@ -46,10 +46,12 @@ describe('Database Table Configuration', function (): void {
         // Create the custom table for testing
         Schema::create($customTableName, function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->string('source')->unique()->index();
+            $table->string('host')->default('');
+            $table->string('source');
             $table->string('destination');
             $table->integer('status_code')->default(301);
             $table->timestamps();
+            $table->unique(['host', 'source']);
         });
 
         $repository = new DatabaseRedirectRepository;
@@ -105,18 +107,22 @@ describe('Database Table Configuration', function (): void {
         // Create both tables
         Schema::create($table1, function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->string('source')->unique()->index();
+            $table->string('host')->default('');
+            $table->string('source');
             $table->string('destination');
             $table->integer('status_code')->default(301);
             $table->timestamps();
+            $table->unique(['host', 'source']);
         });
 
         Schema::create($table2, function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->string('source')->unique()->index();
+            $table->string('host')->default('');
+            $table->string('source');
             $table->string('destination');
             $table->integer('status_code')->default(301);
             $table->timestamps();
+            $table->unique(['host', 'source']);
         });
 
         // Create repositories with different table configurations
@@ -171,10 +177,12 @@ describe('Database Table Configuration', function (): void {
         // Create original table
         Schema::create($originalTable, function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->string('source')->unique()->index();
+            $table->string('host')->default('');
+            $table->string('source');
             $table->string('destination');
             $table->integer('status_code')->default(301);
             $table->timestamps();
+            $table->unique(['host', 'source']);
         });
 
         // Configure and use original table
@@ -192,10 +200,12 @@ describe('Database Table Configuration', function (): void {
         // Create new table and reconfigure
         Schema::create($newTable, function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->string('source')->unique()->index();
+            $table->string('host')->default('');
+            $table->string('source');
             $table->string('destination');
             $table->integer('status_code')->default(301);
             $table->timestamps();
+            $table->unique(['host', 'source']);
         });
 
         // Create new repository instance with new config
