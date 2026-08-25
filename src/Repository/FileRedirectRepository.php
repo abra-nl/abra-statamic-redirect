@@ -182,7 +182,8 @@ class FileRedirectRepository implements RedirectRepository
     {
         $normalizedSource = $this->normalizeUrl($source);
         $normalizedHost = $this->normalizeHost($host);
-        return array_any($this->all(), fn(array $redirect): bool => $redirect['id'] !== $excludeId
+
+        return array_any($this->all(), fn (array $redirect): bool => $redirect['id'] !== $excludeId
             && $this->normalizeUrl($redirect['source']) === $normalizedSource
             && ($redirect['host'] ?? '') === $normalizedHost);
     }

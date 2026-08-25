@@ -106,7 +106,7 @@ describe('ServiceProvider', function (): void {
             $publishes = ServiceProvider::pathsToPublish(ServiceProvider::class, 'config');
 
             expect($publishes)->not->toBeEmpty();
-            $configFound = array_any(array_keys($publishes), fn(int|string $source): bool => str_contains($source, 'redirects.php'));
+            $configFound = array_any(array_keys($publishes), fn (int|string $source): bool => str_contains($source, 'redirects.php'));
 
             expect($configFound)->toBeTrue();
         });
