@@ -39,12 +39,18 @@ All notable changes to `abra-nl/abra-statamic-redirect` are documented in this f
 
 ### Database migration
 
-- The `redirects` table gains a `host` column (`string`, default `''`, not nullable).
-  Existing rows are backfilled with `host = ''`, so nothing already stored changes
-  behavior.
-- The unique index on `source` is replaced with a composite unique index on
-  `['host', 'source']`, so the same path can now have both a global redirect and
-  per-host overrides without a constraint violation.
+- A new migration, `2026_08_25_000000_add_host_to_redirects_table`, adds a `host`
+  column (`string`, default `''`, not nullable) to the `redirects` table and replaces
+  the unique index on `source` with a composite unique index on `['host', 'source']`,
+  so the same path can have both a global redirect and per-host overrides without a
+  constraint violation. Existing rows are backfilled with `host = ''`, so nothing
+  already stored changes behavior.
+- This is a separate migration rather than an edit to the original
+  `create_redirects_table` migration, because sites that installed an earlier version
+  of the addon have already run that migration — Laravel won't re-run a migration file
+  just because its contents changed, so a fix bundled into that file would never reach
+  existing installs. Run `php artisan migrate` after updating to pick it up (publish the
+  addon's migrations first with `php artisan vendor:publish` if you haven't already).
 
 ## Earlier versions
 

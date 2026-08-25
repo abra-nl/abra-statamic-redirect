@@ -24,15 +24,17 @@ describe('Database Table Integration', function (): void {
             'redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary'],
         ]);
 
-        // Run migration to create custom table
-        $migrationPath = __DIR__.'/../../database/migrations/2025_05_08_100000_create_redirects_table.php';
-        require_once $migrationPath;
+        // Run migrations to create custom table
+        require_once __DIR__.'/../../database/migrations/2025_05_08_100000_create_redirects_table.php';
+        require_once __DIR__.'/../../database/migrations/2026_08_25_000000_add_host_to_redirects_table.php';
 
         $migration = new CreateRedirectsTable;
+        $addHostMigration = new AddHostToRedirectsTable;
 
         // Clean up any existing table
         Schema::dropIfExists($customTableName);
         $migration->up();
+        $addHostMigration->up();
 
         // Verify custom table was created
         expect(Schema::hasTable($customTableName))->toBeTrue();

@@ -16,12 +16,10 @@ class CreateRedirectsTable extends Migration
 
         Schema::create($table, function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('host')->default('');
-            $table->string('source');
+            $table->string('source')->unique()->index();
             $table->string('destination');
             $table->integer('status_code')->default(301);
             $table->timestamps();
-            $table->unique(['host', 'source']);
         });
     }
 
