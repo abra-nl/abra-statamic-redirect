@@ -2,6 +2,37 @@
 
 All notable changes to `abra-nl/abra-statamic-redirect` are documented in this file.
 
+## v3.1.0
+
+### Added
+
+- **The Control Panel listing now uses Statamic's `Listing` component**, replacing the
+  hand-rolled table. This adds free-text search (matching host, source, and
+  destination), sortable columns, and server-side pagination, none of which the
+  previous table had.
+- **Bulk delete.** Selecting multiple redirects now surfaces a bulk-actions toolbar,
+  powered by a new `DeleteRedirect` action and `RedirectActionController`. Per-row
+  delete still works the same way, now via the row's action dropdown instead of a
+  standalone trash icon.
+  - New routes: `POST redirects/actions` and `POST redirects/actions/list`.
+
+### Changed
+
+- The listing's empty state is now the `Listing` component's generic "No results"
+  message rather than the previous "Start by creating your first redirect" call to
+  action. The "Create redirect" button in the header is unaffected and always visible.
+- `RedirectController::index()` no longer passes the full `redirects` array to the
+  page; it now passes `jsonUrl` and `actionUrl`, and a new `json()` action serves the
+  listing data. This is an internal change — no addon consumers integrate with these
+  Inertia props directly, so it isn't called out as breaking.
+
+### Fixed
+
+- Searching the listing could throw a fatal error on file storage if any redirect
+  predates host scoping and has no `host` key at all (only possible with the file
+  driver — the database column always has a default). The search filter now treats a
+  missing `host` the same way the rest of the codebase already does: as "any host".
+
 ## v3.0.0
 
 ### Added

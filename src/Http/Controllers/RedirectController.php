@@ -3,8 +3,10 @@
 namespace Abra\AbraStatamicRedirect\Http\Controllers;
 
 use Abra\AbraStatamicRedirect\Interfaces\RedirectRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Inertia\Inertia;
 use Inertia\Response;
 use Statamic\Http\Controllers\CP\CpController;
@@ -18,12 +20,69 @@ class RedirectController extends CpController
      */
     public function index(): Response
     {
-        $redirects = $this->redirects->all();
-
         return Inertia::render('abra-redirects::Index', [
-            'redirects' => $redirects,
             'statusCodes' => config('redirects.status_codes'),
+            'jsonUrl' => cp_route('abra-statamic-redirects.json'),
+            'actionUrl' => cp_route('abra-statamic-redirects.actions.run'),
         ]);
+    }
+
+    /**
+     * Return a paginated, searchable, sortable listing of redirects for the Listing component
+     */
+    public function json(Request $request): JsonResponse
+    {
+        $redirects = collect($this->redirects->all());
+
+        if ($search = $request->string('search')->toString()) {
+            $redirects = $redirects->filter(fn (array $redirect): bool => str_contains(strtolower($redirect['host'] ?? ''), strtolower($search))
+                || str_contains(strtolower($redirect['source']), strtolower($search))
+                || str_contains(strtolower($redirect['destination']), strtolower($search)));
+        }
+
+        $sort = $request->string('sort', 'host')->toString();
+        $descending = $request->string('order', 'asc')->toString() === 'desc';
+
+        $redirects = $redirects
+            ->sortBy(fn (array $redirect) => $redirect[$sort] ?? null, SORT_REGULAR, $descending)
+            ->values();
+
+        $perPage = $request->integer('perPage', config('statamic.cp.pagination_size'));
+        $page = $request->integer('page', 1);
+
+        $paginator = new LengthAwarePaginator(
+            $redirects->forPage($page, $perPage)->values(),
+            $redirects->count(),
+            $perPage,
+            $page,
+        );
+
+        return response()->json([
+            'data' => $paginator->items(),
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'from' => $paginator->firstItem(),
+                'to' => $paginator->lastItem(),
+                'columns' => $this->listingColumns(),
+                'activeFilterBadges' => [],
+            ],
+        ]);
+    }
+
+    /**
+     * @return array<int, array{field: string, label: string, sortable: bool, visible: bool}>
+     */
+    private function listingColumns(): array
+    {
+        return [
+            ['field' => 'host', 'label' => __('Host'), 'sortable' => true, 'visible' => true],
+            ['field' => 'source', 'label' => __('Source'), 'sortable' => true, 'visible' => true],
+            ['field' => 'destination', 'label' => __('Destination'), 'sortable' => true, 'visible' => true],
+            ['field' => 'status_code', 'label' => __('Status code'), 'sortable' => true, 'visible' => true],
+        ];
     }
 
     public function create(): Response
@@ -61,14 +120,14 @@ class RedirectController extends CpController
     /**
      * Show the form for editing a redirect
      */
-    public function edit(string $id): Response
+    public function edit(string $id): Response|RedirectResponse
     {
         $redirects = $this->redirects->all();
         $redirect = collect($redirects)->firstWhere('id', $id);
 
         if (! $redirect) {
-            // TODO - Render error
-            return Inertia::render('abra-redirects::Index');
+            return redirect()->route('statamic.cp.abra-statamic-redirects.index')
+                ->with('error', __('Redirect not found.'));
         }
 
         return Inertia::render('abra-redirects::Edit', [
