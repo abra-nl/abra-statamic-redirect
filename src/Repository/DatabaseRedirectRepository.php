@@ -28,12 +28,12 @@ class DatabaseRedirectRepository implements RedirectRepository
     }
 
     /**
-     * @return array<int, array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}>
+     * @return array<int, array{id: string, host: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}>
      */
     public function all(): array
     {
         if ($this->cache_enabled && Cache::has('redirects.all')) {
-            /** @var array<int, array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}> $redirects */
+            /** @var array<int, array{id: string, host: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}> $redirects */
             $redirects = Cache::get('redirects.all');
 
             return $redirects;
@@ -53,24 +53,35 @@ class DatabaseRedirectRepository implements RedirectRepository
     }
 
     /**
-     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}|null
+     * @return array{id: string, host: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}|null
      */
-    public function find(string $source): ?array
+    public function find(string $source, ?string $host = null): ?array
     {
         $normalizedSource = $this->normalizeUrl($source);
+        $normalizedHost = $this->normalizeHost($host);
 
         $redirect = DB::table($this->table)
             ->where('source', $normalizedSource)
+            ->where(function ($query) use ($normalizedHost): void {
+                $query->where('host', '')->orWhere('host', $normalizedHost);
+            })
+            ->orderByRaw("host != '' desc")
             ->first();
 
         if ($redirect) {
             return (array) $redirect;
         }
 
-        // If no exact match found, try wildcard patterns
-        $allRedirects = $this->all();
+        // If no exact match found, try wildcard patterns scoped to this host,
+        // preferring a host-specific pattern over a global one.
+        $candidates = array_values(array_filter(
+            $this->all(),
+            fn (array $r): bool => $r['host'] === '' || $r['host'] === $normalizedHost,
+        ));
 
-        foreach ($allRedirects as $redirect) {
+        usort($candidates, fn (array $a, array $b): int => ($b['host'] !== '') <=> ($a['host'] !== ''));
+
+        foreach ($candidates as $redirect) {
             $pattern = $redirect['source'];
 
             // Check if the redirect source contains a wildcard
@@ -96,8 +107,8 @@ class DatabaseRedirectRepository implements RedirectRepository
     }
 
     /**
-     * @param  array{source: string, destination: string, status_code?: int}  $data
-     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}
+     * @param  array{host?: ?string, source: string, destination: string, status_code?: int}  $data
+     * @return array{id: string, host: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}
      */
     public function store(array $data): array
     {
@@ -106,6 +117,7 @@ class DatabaseRedirectRepository implements RedirectRepository
 
         $redirect = [
             'id' => $id,
+            'host' => $this->normalizeHost($data['host'] ?? null),
             'source' => $this->normalizeUrl($data['source']),
             'destination' => $data['destination'],
             'status_code' => $data['status_code'] ?? 301,
@@ -123,8 +135,8 @@ class DatabaseRedirectRepository implements RedirectRepository
     }
 
     /**
-     * @param  array{source?: string, destination?: string, status_code?: int}  $data
-     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}
+     * @param  array{host?: ?string, source?: string, destination?: string, status_code?: int}  $data
+     * @return array{id: string, host: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}
      */
     public function update(string $id, array $data): array
     {
@@ -139,6 +151,10 @@ class DatabaseRedirectRepository implements RedirectRepository
         $updateData = [
             'updated_at' => now(),
         ];
+
+        if (array_key_exists('host', $data)) {
+            $updateData['host'] = $this->normalizeHost($data['host']);
+        }
 
         if (isset($data['source'])) {
             $updateData['source'] = $this->normalizeUrl($data['source']);
@@ -180,12 +196,14 @@ class DatabaseRedirectRepository implements RedirectRepository
         return (bool) $deleted;
     }
 
-    public function exists(string $source, ?string $excludeId = null): bool
+    public function exists(string $source, ?string $host = null, ?string $excludeId = null): bool
     {
         $normalizedSource = $this->normalizeUrl($source);
+        $normalizedHost = $this->normalizeHost($host);
 
         $query = DB::table($this->table)
-            ->where('source', $normalizedSource);
+            ->where('source', $normalizedSource)
+            ->where('host', $normalizedHost);
 
         if ($excludeId) {
             $query->where('id', '!=', $excludeId);

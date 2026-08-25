@@ -18,6 +18,11 @@ class TestClassWithWildcardPatterns
         return $this->normalizeUrl($url);
     }
 
+    public function testNormalizeHost(?string $host): string
+    {
+        return $this->normalizeHost($host);
+    }
+
     public function testApplyWildcardSubstitution(string $source, string $pattern, string $destination): string
     {
         return $this->applyWildcardSubstitution($source, $pattern, $destination);
@@ -50,6 +55,28 @@ describe('ConvertsWildcardPatterns', function (): void {
         test('handles URLs with multiple segments', function (): void {
             expect($this->testClass->testNormalizeUrl('/blog/posts/2023/'))->toBe('/blog/posts/2023');
             expect($this->testClass->testNormalizeUrl('/api/v1/users/'))->toBe('/api/v1/users');
+        });
+    });
+
+    describe('normalizeHost', function (): void {
+        test('returns empty string for null or blank host', function (): void {
+            expect($this->testClass->testNormalizeHost(null))->toBe('')
+                ->and($this->testClass->testNormalizeHost(''))->toBe('')
+                ->and($this->testClass->testNormalizeHost('   '))->toBe('');
+        });
+
+        test('leaves a bare host untouched', function (): void {
+            expect($this->testClass->testNormalizeHost('abra.nl'))->toBe('abra.nl');
+        });
+
+        test('strips an accidentally-pasted scheme', function (): void {
+            expect($this->testClass->testNormalizeHost('https://abra.nl'))->toBe('abra.nl')
+                ->and($this->testClass->testNormalizeHost('http://abra.nl'))->toBe('abra.nl');
+        });
+
+        test('trims surrounding whitespace and a trailing slash', function (): void {
+            expect($this->testClass->testNormalizeHost(' abra.nl '))->toBe('abra.nl')
+                ->and($this->testClass->testNormalizeHost('https://abra.nl/'))->toBe('abra.nl');
         });
     });
 

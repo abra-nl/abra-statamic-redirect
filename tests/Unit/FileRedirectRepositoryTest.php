@@ -735,8 +735,8 @@ describe('FileRedirectRepository', function (): void {
             $repository = new FileRedirectRepository;
 
             expect($repository->exists('/existing-source'))->toBeTrue() // Without exclusion - should exist
-                ->and($repository->exists('/existing-source', 'exists-test-1'))->toBeFalse() // With exclusion - should not exist (excluded)
-                ->and($repository->exists('/existing-source', 'different-id'))->toBeTrue(); // Different ID exclusion - should still exist
+                ->and($repository->exists('/existing-source', null, 'exists-test-1'))->toBeFalse() // With exclusion - should not exist (excluded)
+                ->and($repository->exists('/existing-source', null, 'different-id'))->toBeTrue(); // Different ID exclusion - should still exist
         });
 
         test('handles empty redirects file', function (): void {
