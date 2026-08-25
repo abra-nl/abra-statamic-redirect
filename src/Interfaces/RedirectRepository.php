@@ -9,7 +9,11 @@ interface RedirectRepository
     /**
      * Get all redirects
      *
-     * @return array<int, array{id: string, host: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}>
+     * The `host` key may be entirely absent on rows written before host
+     * scoping was introduced (this only affects file storage, since the
+     * database column always has a default).
+     *
+     * @return array<int, array{id: string, host?: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}>
      */
     public function all(): array;
 
@@ -21,7 +25,11 @@ interface RedirectRepository
      * host-specific redirect match the same source, the host-specific one
      * takes precedence.
      *
-     * @return array{id: string, host: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}|null
+     * The `host` key may be entirely absent on rows written before host
+     * scoping was introduced (this only affects file storage, since the
+     * database column always has a default).
+     *
+     * @return array{id: string, host?: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}|null
      */
     public function find(string $source, ?string $host = null): ?array;
 

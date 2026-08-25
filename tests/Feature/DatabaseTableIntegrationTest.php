@@ -59,6 +59,9 @@ describe('Database Table Integration', function (): void {
         // Test through controller - display redirects
         $response = $this->get(cp_route('abra-statamic-redirects.index'));
         $response->assertStatus(200);
+
+        $response = $this->get(cp_route('abra-statamic-redirects.json'));
+        $response->assertStatus(200);
         $response->assertSee('/integration-test-source');
         $response->assertSee('/integration-test-destination');
 

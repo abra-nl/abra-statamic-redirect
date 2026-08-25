@@ -19,6 +19,7 @@ beforeEach(function (): void {
     // Sample redirect data
     $this->sampleRedirect = [
         'id' => '123',
+        'host' => '',
         'source' => '/old-page',
         'destination' => '/new-page',
         'status_code' => 301,
@@ -32,11 +33,59 @@ beforeEach(function (): void {
 });
 
 describe('RedirectController', function (): void {
-    test('index displays list of redirects', function (): void {
+    test('index renders the listing page', function (): void {
+        config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
+
+        $response = $this->get(cp_route('abra-statamic-redirects.index'));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (Assert $assert): Assert => $assert
+            ->component('abra-redirects::Index')
+            ->where('jsonUrl', cp_route('abra-statamic-redirects.json'))
+            ->where('actionUrl', cp_route('abra-statamic-redirects.actions.run'))
+            ->where('statusCodes', [301 => 'Permanent', 302 => 'Temporary']),
+        );
+    });
+
+    test('json returns a paginated list of redirects', function (): void {
+        $redirects = array_map(
+            fn (int $i): array => [
+                'id' => (string) $i,
+                'host' => '',
+                'source' => sprintf('/old-page-%02d', $i),
+                'destination' => sprintf('/new-page-%02d', $i),
+                'status_code' => 301,
+            ],
+            range(1, 60),
+        );
+
+        $this->redirectRepository
+            ->shouldReceive('all')
+            ->once()
+            ->andReturn($redirects);
+
+        config(['statamic.cp.pagination_size' => 25]);
+
+        $response = $this->get(cp_route('abra-statamic-redirects.json', ['page' => 2]));
+
+        $response->assertStatus(200);
+        $response->assertJson(fn ($json) => $json
+            ->has('data', 25)
+            ->where('meta.current_page', 2)
+            ->where('meta.per_page', 25)
+            ->where('meta.total', 60)
+            ->where('meta.last_page', 3)
+            ->has('meta.columns', 4)
+            ->etc(),
+        );
+    });
+
+    test('json filters redirects by search', function (): void {
         $redirects = [
             $this->sampleRedirect,
             [
                 'id' => '456',
+                'host' => '',
                 'source' => '/another-old-page',
                 'destination' => '/another-new-page',
                 'status_code' => 302,
@@ -48,16 +97,67 @@ describe('RedirectController', function (): void {
             ->once()
             ->andReturn($redirects);
 
-        config(['redirects.status_codes' => [301 => 'Permanent', 302 => 'Temporary']]);
-
-        $response = $this->get(cp_route('abra-statamic-redirects.index'));
+        $response = $this->get(cp_route('abra-statamic-redirects.json', ['search' => 'another']));
 
         $response->assertStatus(200);
-        $response->assertInertia(fn (Assert $assert): Assert => $assert
-            ->component('abra-redirects::Index')
-            ->has('redirects', 2)
-            ->where('redirects', $redirects)
-            ->where('statusCodes', [301 => 'Permanent', 302 => 'Temporary']),
+        $response->assertJson(fn ($json) => $json
+            ->has('data', 1)
+            ->where('data.0.id', '456')
+            ->etc(),
+        );
+    });
+
+    test('json searches redirects that have no host key at all', function (): void {
+        // Legacy file-storage rows written before host scoping was introduced
+        // may not have a 'host' key at all.
+        $redirects = [
+            [
+                'id' => '789',
+                'source' => '/legacy-page',
+                'destination' => '/legacy-new-page',
+                'status_code' => 301,
+            ],
+        ];
+
+        $this->redirectRepository
+            ->shouldReceive('all')
+            ->once()
+            ->andReturn($redirects);
+
+        $response = $this->get(cp_route('abra-statamic-redirects.json', ['search' => 'legacy']));
+
+        $response->assertStatus(200);
+        $response->assertJson(fn ($json) => $json
+            ->has('data', 1)
+            ->where('data.0.id', '789')
+            ->etc(),
+        );
+    });
+
+    test('json sorts redirects descending', function (): void {
+        $redirects = [
+            $this->sampleRedirect,
+            [
+                'id' => '456',
+                'host' => '',
+                'source' => '/zzz-page',
+                'destination' => '/another-new-page',
+                'status_code' => 302,
+            ],
+        ];
+
+        $this->redirectRepository
+            ->shouldReceive('all')
+            ->once()
+            ->andReturn($redirects);
+
+        $response = $this->get(cp_route('abra-statamic-redirects.json', ['sort' => 'source', 'order' => 'desc']));
+
+        $response->assertStatus(200);
+        $response->assertJson(fn ($json) => $json
+            ->where('data.0.id', '456')
+            ->where('data.1.id', '123')
+            ->etc(),
         );
     });
 
@@ -170,7 +270,7 @@ describe('RedirectController', function (): void {
         );
     });
 
-    test('edit renders index when redirect not found', function (): void {
+    test('edit redirects to index when redirect not found', function (): void {
         $this->redirectRepository
             ->shouldReceive('all')
             ->once()
@@ -178,10 +278,8 @@ describe('RedirectController', function (): void {
 
         $response = $this->get(cp_route('abra-statamic-redirects.edit', ['id' => 'nonexistent']));
 
-        $response->assertStatus(200);
-        $response->assertInertia(fn (Assert $assert): Assert => $assert
-            ->component('abra-redirects::Index'),
-        );
+        $response->assertRedirect(cp_route('abra-statamic-redirects.index'));
+        $response->assertSessionHas('error', 'Redirect not found.');
     });
 
     test('update modifies existing redirect successfully', function (): void {

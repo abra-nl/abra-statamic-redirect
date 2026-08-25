@@ -22,13 +22,13 @@ describe('Repository Integration', function (): void {
         // Mock the file repository directly in the container
         $mockRepository = Mockery::mock(FileRedirectRepository::class);
         $mockRepository->shouldReceive('all')->once()->andReturn([
-            ['id' => '1', 'source' => '/test', 'destination' => '/new', 'status_code' => 301],
+            ['id' => '1', 'host' => '', 'source' => '/test', 'destination' => '/new', 'status_code' => 301],
         ]);
 
         // Replace the bound repository
         app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
-        $response = $this->get(cp_route('abra-statamic-redirects.index'));
+        $response = $this->get(cp_route('abra-statamic-redirects.json'));
 
         $response->assertStatus(200);
 
@@ -43,13 +43,13 @@ describe('Repository Integration', function (): void {
         // Mock the database repository directly in the container
         $mockRepository = Mockery::mock(DatabaseRedirectRepository::class);
         $mockRepository->shouldReceive('all')->once()->andReturn([
-            ['id' => '1', 'source' => '/test', 'destination' => '/new', 'status_code' => 301],
+            ['id' => '1', 'host' => '', 'source' => '/test', 'destination' => '/new', 'status_code' => 301],
         ]);
 
         // Replace the bound repository
         app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
-        $response = $this->get(cp_route('abra-statamic-redirects.index'));
+        $response = $this->get(cp_route('abra-statamic-redirects.json'));
 
         $response->assertStatus(200);
 
@@ -79,9 +79,9 @@ describe('Repository Integration', function (): void {
 
         app()->bind(RedirectRepository::class, fn () => $mockRepository);
 
-        // Make multiple requests to the index (both call all())
-        $this->get(cp_route('abra-statamic-redirects.index'));
-        $this->get(cp_route('abra-statamic-redirects.index'));
+        // Make multiple requests to the json endpoint (both call all())
+        $this->get(cp_route('abra-statamic-redirects.json'));
+        $this->get(cp_route('abra-statamic-redirects.json'));
 
         // Verify repository was used for both requests
         $mockRepository->shouldHaveReceived('all')->twice();
