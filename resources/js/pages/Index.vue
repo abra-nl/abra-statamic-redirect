@@ -44,6 +44,7 @@ const confirmDelete = () => {
       <Card>
         <Table>
           <TableColumns>
+            <TableColumn>{{ __('Host') }}</TableColumn>
             <TableColumn>{{ __('Source') }}</TableColumn>
             <TableColumn>{{ __('Destination') }}</TableColumn>
             <TableColumn>{{ __('Status code') }}</TableColumn>
@@ -51,6 +52,7 @@ const confirmDelete = () => {
           </TableColumns>
           <TableRows>
             <TableRow v-for="redirect in redirects" :key="redirect.id">
+              <TableCell>{{ redirect.host || __('Any') }}</TableCell>
               <TableCell>{{ redirect.source}}</TableCell>
               <TableCell>{{ redirect.destination }}</TableCell>
               <TableCell>{{redirect.status_code}}</TableCell>

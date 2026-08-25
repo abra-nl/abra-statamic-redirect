@@ -34,9 +34,10 @@ class RedirectMiddleware
         }
 
         $requestPath = $this->normalizePath($request->path());
+        $requestHost = $request->getHost();
 
         // Check if there's a redirect for this path
-        if ($redirect = $this->findRedirectForPath($requestPath)) {
+        if ($redirect = $this->findRedirectForPath($requestPath, $requestHost)) {
             // Handle query parameters if needed
             $destination = $redirect['destination'];
             if ($request->getQueryString()) {
@@ -50,19 +51,19 @@ class RedirectMiddleware
     }
 
     /**
-     * Find a redirect for the given path
+     * Find a redirect for the given path and host
      *
-     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}|null
+     * @return array{id: string, host: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}|null
      */
-    protected function findRedirectForPath(string $path): ?array
+    protected function findRedirectForPath(string $path, string $host): ?array
     {
-        $cacheKey = 'redirect_for_path_'.md5($path);
+        $cacheKey = 'redirect_for_path_'.md5($host.'|'.$path);
 
         if ($this->cache_enabled && Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
 
-        $redirect = $this->redirects->find($path);
+        $redirect = $this->redirects->find($path, $host);
 
         if ($this->cache_enabled && $redirect) {
             Cache::put($cacheKey, $redirect, $this->cache_expiry);

@@ -42,13 +42,14 @@ class RedirectController extends CpController
         $statusCodes = config('redirects.status_codes');
 
         $validated = $request->validate([
+            'host' => 'nullable|string',
             'source' => 'required|string',
             'destination' => 'required|string',
             'status_code' => 'required|integer|in:'.implode(',', array_keys($statusCodes)),
         ]);
 
-        // Check if source already exists
-        if ($this->redirects->exists($validated['source'])) {
+        // Check if source already exists for this host
+        if ($this->redirects->exists($validated['source'], $validated['host'] ?? null)) {
             return back()->withErrors(['source' => __('A redirect with this source URL already exists.')])->withInput();
         }
 
@@ -88,13 +89,14 @@ class RedirectController extends CpController
         $statusCodes = config('redirects.status_codes');
 
         $validated = $request->validate([
+            'host' => 'nullable|string',
             'source' => 'required|string',
             'destination' => 'required|string',
             'status_code' => 'required|integer|in:'.implode(',', array_keys($statusCodes)),
         ]);
 
-        // Check if source already exists (excluding this redirect)
-        if ($this->redirects->exists($validated['source'], $id)) {
+        // Check if source already exists for this host (excluding this redirect)
+        if ($this->redirects->exists($validated['source'], $validated['host'] ?? null, $id)) {
             return back()->withErrors(['source' => __('A redirect with this source URL already exists.')])->withInput();
         }
 

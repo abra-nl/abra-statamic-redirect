@@ -131,4 +131,28 @@ trait ConvertsWildcardPatterns
 
         return $url;
     }
+
+    /**
+     * Normalize a host value for consistent storage and matching.
+     *
+     * Strips any accidentally-pasted scheme (e.g. "https://abra.nl" -> "abra.nl")
+     * and trailing slashes. Returns an empty string for a blank/null host, which
+     * represents "matches any host".
+     */
+    protected function normalizeHost(?string $host): string
+    {
+        if ($host === null) {
+            return '';
+        }
+
+        $host = trim($host);
+
+        if ($host === '') {
+            return '';
+        }
+
+        $host = preg_replace('#^[a-zA-Z][a-zA-Z0-9+.-]*://#', '', $host) ?? $host;
+
+        return rtrim($host, '/');
+    }
 }

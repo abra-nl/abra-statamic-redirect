@@ -37,7 +37,7 @@ class FileRedirectRepository implements RedirectRepository
     }
 
     /**
-     * @return array<int, array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}>
+     * @return array<int, array{id: string, host?: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}>
      */
     public function all(): array
     {
@@ -55,22 +55,34 @@ class FileRedirectRepository implements RedirectRepository
     }
 
     /**
-     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}|null
+     * @return array{id: string, host?: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}|null
      */
-    public function find(string $source): ?array
+    public function find(string $source, ?string $host = null): ?array
     {
         // Normalize the source URL for matching
         $normalizedSource = $this->normalizeUrl($source);
+        $normalizedHost = $this->normalizeHost($host);
 
         $all = $this->all();
 
-        foreach ($all as $redirect) {
-            if ($this->normalizeUrl($redirect['source']) === $normalizedSource) {
-                return $redirect;
-            }
+        $matchesHost = fn (array $r): bool => ($r['host'] ?? '') === '' || ($r['host'] ?? '') === $normalizedHost;
+        $hostSpecificFirst = fn (array $a, array $b): int => (($b['host'] ?? '') !== '') <=> (($a['host'] ?? '') !== '');
+
+        $exactMatches = array_values(array_filter(
+            $all,
+            fn (array $r): bool => $this->normalizeUrl($r['source']) === $normalizedSource && $matchesHost($r),
+        ));
+
+        if ($exactMatches !== []) {
+            usort($exactMatches, $hostSpecificFirst);
+
+            return $exactMatches[0];
         }
 
-        foreach ($all as $redirect) {
+        $wildcardCandidates = array_values(array_filter($all, $matchesHost));
+        usort($wildcardCandidates, $hostSpecificFirst);
+
+        foreach ($wildcardCandidates as $redirect) {
             $pattern = $redirect['source'];
 
             // Check if the redirect source contains a wildcard
@@ -96,8 +108,8 @@ class FileRedirectRepository implements RedirectRepository
     }
 
     /**
-     * @param  array{source: string, destination: string, status_code?: int}  $data
-     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}
+     * @param  array{host?: ?string, source: string, destination: string, status_code?: int}  $data
+     * @return array{id: string, host: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}
      */
     public function store(array $data): array
     {
@@ -106,6 +118,7 @@ class FileRedirectRepository implements RedirectRepository
         $id = Str::uuid()->toString();
         $redirect = [
             'id' => $id,
+            'host' => $this->normalizeHost($data['host'] ?? null),
             'source' => $data['source'],
             'destination' => $data['destination'],
             'status_code' => $data['status_code'] ?? 301,
@@ -121,8 +134,8 @@ class FileRedirectRepository implements RedirectRepository
     }
 
     /**
-     * @param  array{source?: string, destination?: string, status_code?: int}  $data
-     * @return array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}
+     * @param  array{host?: ?string, source?: string, destination?: string, status_code?: int}  $data
+     * @return array{id: string, host: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}
      */
     public function update(string $id, array $data): array
     {
@@ -131,6 +144,9 @@ class FileRedirectRepository implements RedirectRepository
         foreach ($redirects as $key => $redirect) {
             if ($redirect['id'] === $id) {
                 $redirects[$key] = array_merge($redirect, [
+                    'host' => array_key_exists('host', $data)
+                        ? $this->normalizeHost($data['host'])
+                        : ($redirect['host'] ?? ''),
                     'source' => $data['source'] ?? $redirect['source'],
                     'destination' => $data['destination'] ?? $redirect['destination'],
                     'status_code' => $data['status_code'] ?? $redirect['status_code'],
@@ -162,12 +178,15 @@ class FileRedirectRepository implements RedirectRepository
         return false;
     }
 
-    public function exists(string $source, ?string $excludeId = null): bool
+    public function exists(string $source, ?string $host = null, ?string $excludeId = null): bool
     {
         $normalizedSource = $this->normalizeUrl($source);
+        $normalizedHost = $this->normalizeHost($host);
 
         foreach ($this->all() as $redirect) {
-            if ($redirect['id'] !== $excludeId && $this->normalizeUrl($redirect['source']) === $normalizedSource) {
+            if ($redirect['id'] !== $excludeId
+                && $this->normalizeUrl($redirect['source']) === $normalizedSource
+                && ($redirect['host'] ?? '') === $normalizedHost) {
                 return true;
             }
         }
@@ -176,7 +195,7 @@ class FileRedirectRepository implements RedirectRepository
     }
 
     /**
-     * @return array<int, array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}>
+     * @return array<int, array{id: string, host?: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}>
      */
     protected function getRedirects(): array
     {
@@ -190,7 +209,7 @@ class FileRedirectRepository implements RedirectRepository
     /**
      * Save redirects to YAML file
      *
-     * @param  array<int, array{id: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}>  $redirects
+     * @param  array<int, array{id: string, host?: string, source: string, destination: string, status_code: int, created_at: string, updated_at: string}>  $redirects
      */
     protected function saveRedirects(array $redirects): bool
     {
