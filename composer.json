@@ -20,15 +20,15 @@
       }
     },
     "require-dev": {
-        "orchestra/testbench": "^10.6",
-        "pestphp/pest": "^4.0",
+        "orchestra/testbench": "^11.0",
+        "pestphp/pest": "^5.0",
         "mockery/mockery": "^1.6",
         "laravel/pint": "^1.0",
-        "phpstan/phpstan": "^1.0",
-        "rector/rector": "^1.0"
+        "phpstan/phpstan": "^2.0",
+        "rector/rector": "^2.0"
     },
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "statamic/cms": "^6.0"
     },
     "config": {

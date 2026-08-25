@@ -23,7 +23,7 @@ return RectorConfig::configure()
     // Apply rule sets
     ->withSets([
         // PHP version sets
-        LevelSetList::UP_TO_PHP_81,
+        LevelSetList::UP_TO_PHP_84,
 
         // General code quality sets
         SetList::CODE_QUALITY,
