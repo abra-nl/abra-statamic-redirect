@@ -16,7 +16,6 @@ describe('Database Table Configuration', function (): void {
         // Use reflection to access private table property
         $reflection = new ReflectionClass($repository);
         $tableProperty = $reflection->getProperty('table');
-        $tableProperty->setAccessible(true);
 
         expect($tableProperty->getValue($repository))->toBe('redirects');
 
@@ -34,7 +33,6 @@ describe('Database Table Configuration', function (): void {
         // Use reflection to access private table property
         $reflection = new ReflectionClass($repository);
         $tableProperty = $reflection->getProperty('table');
-        $tableProperty->setAccessible(true);
 
         expect($tableProperty->getValue($repository))->toBe('custom_redirects_table');
     });

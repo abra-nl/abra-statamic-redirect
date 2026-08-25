@@ -304,12 +304,10 @@ describe('RedirectMiddleware', function (): void {
         $reflection = new ReflectionClass($middleware);
 
         $cacheEnabledProperty = $reflection->getProperty('cache_enabled');
-        $cacheEnabledProperty->setAccessible(true);
 
         expect($cacheEnabledProperty->getValue($middleware))->toBeTrue();
 
         $cacheExpiryProperty = $reflection->getProperty('cache_expiry');
-        $cacheExpiryProperty->setAccessible(true);
 
         expect($cacheExpiryProperty->getValue($middleware))->toBe(120);
     });
@@ -324,12 +322,10 @@ describe('RedirectMiddleware', function (): void {
         $reflection = new ReflectionClass($middleware);
 
         $cacheEnabledProperty = $reflection->getProperty('cache_enabled');
-        $cacheEnabledProperty->setAccessible(true);
 
         expect($cacheEnabledProperty->getValue($middleware))->toBeFalse(); // Default false
 
         $cacheExpiryProperty = $reflection->getProperty('cache_expiry');
-        $cacheExpiryProperty->setAccessible(true);
 
         expect($cacheExpiryProperty->getValue($middleware))->toBe(60); // Default 60
     });
